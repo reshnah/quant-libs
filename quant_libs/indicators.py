@@ -1,4 +1,4 @@
-from utils import *
+from quant_libs.utils import *
 
 @singleton
 class IndicatorSetting:

@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name="quant-libs",  # Package name
     version="0.0.1",    # Version number
-    packages=find_packages("indicators"),  # Automatically find packages
+    packages=find_packages(),  # Automatically find packages
     install_requires=[  # List dependencies
         #"requests>=2.25.1",
         #"numpy>=1.19.2",
