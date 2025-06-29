@@ -40,19 +40,6 @@ def kMeansPp(data_input, num_cluster, distance_func):
     
     return [data_input[c] for c in centroid_ids]
 
-def testKMeansPp():
-    import random
-    data_input = []
-    sigma = 0.3
-    for _ in range(100):
-        data_input.append([random.gauss(1, sigma), random.gauss(1, sigma)])
-    for _ in range(50):
-        data_input.append([random.gauss(2, sigma), random.gauss(2, sigma)])
-    for _ in range(50):
-        data_input.append([random.gauss(1, sigma), random.gauss(3, sigma)])
-    def dist_metric(a, b):
-        return sum((aa-bb)**2 for aa, bb in zip(a,b))**0.5
-    kMeansPp(data_input, 3, dist_metric)
 
 def kMeans(data_input, num_cluster, distance_func, iteration=10):
     labels = []
@@ -81,10 +68,46 @@ def kMeans(data_input, num_cluster, distance_func, iteration=10):
                 sum_data = sum_data + np.array(d)
                 cluster_size += 1
             centroids[ci] = list(sum_data / cluster_size)
-
-
-
+        if DSciSetting().debug:
+            if len(data_input[0]) == 2:
+                from matplotlib import pyplot as plt
+                plt.scatter([d[0] for d in data_input], [d[1] for d in data_input], c=labels, cmap="viridis", alpha=0.5)
+                plt.scatter([c[0] for c in centroids],
+                            [c[1] for c in centroids], marker="x", c="red", s=200, linewidths=3)
+                plt.show()
 
     return labels[:]
 
 
+def testKMeansPp():
+    import random
+    DSciSetting().enableDebug()
+    data_input = []
+    sigma = 0.3
+    for _ in range(100):
+        data_input.append([random.gauss(1, sigma), random.gauss(1, sigma)])
+    for _ in range(50):
+        data_input.append([random.gauss(2, sigma), random.gauss(2, sigma)])
+    for _ in range(50):
+        data_input.append([random.gauss(1, sigma), random.gauss(3, sigma)])
+    def dist_metric(a, b):
+        return sum((aa-bb)**2 for aa, bb in zip(a,b))**0.5
+    kMeansPp(data_input, 3, dist_metric)
+
+
+def testKMeans():
+    import random
+    DSciSetting().enableDebug()
+    data_input = []
+    sigma = 0.3
+    for _ in range(100):
+        data_input.append([random.gauss(1, sigma), random.gauss(1, sigma)])
+    for _ in range(50):
+        data_input.append([random.gauss(2, sigma), random.gauss(2, sigma)])
+    for _ in range(50):
+        data_input.append([random.gauss(1, sigma), random.gauss(3, sigma)])
+    for _ in range(100):
+        data_input.append([random.gauss(1.5, sigma), random.gauss(1.5, sigma)])
+    def dist_metric(a, b):
+        return sum((aa-bb)**2 for aa, bb in zip(a,b))**0.5
+    kMeans(data_input, 4, dist_metric)
