@@ -73,6 +73,7 @@ def readCsvChartDict(csv_path):
     with open(csv_path, newline='') as f:
         reader = csv.reader(f, delimiter=',')        
         first_row = next(reader)
+        first_row = [f.lower() for f in first_row]
         for row in reader:
             for ri, header in enumerate(first_row):
                 k = chart_tag_map[header]

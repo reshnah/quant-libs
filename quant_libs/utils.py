@@ -27,3 +27,12 @@ def sign(n):
         return -1
     else:
         return 0
+
+def transpose(l_2d):
+    n_row = len(l_2d)
+    n_col = len(l_2d[0])
+    transposed = []
+    for c in range(n_col):
+        row = [l_2d[r][c] for r in range(n_row)]
+        transposed.append(row[:])
+    return transposed

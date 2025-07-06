@@ -12,6 +12,65 @@ class DSciSetting:
     def disableDebug(self):
         self.debug = False
 
+class Kmeans:
+    def __init__(self):
+        self.centroids = []
+        self.distance_func = None
+        self.feature_weight = []
+        return
+    
+    def getLabel(self, data_input):
+        nearest_distance = float("inf")
+        label = -1
+        for ci, centroid in enumerate(self.centroids):
+            dist = self.distance_func(data_input, centroid)
+            if nearest_distance > dist:
+                nearest_distance = dist
+                label = ci
+        return label
+
+    def kMeans(self, data_input, num_cluster, distance_func, iteration=10, wcss_en=False):
+        labels = []
+
+        self.centroids = kMeansPp(data_input, num_cluster, distance_func)
+        self.distance_func = distance_func
+        wcss = 0
+        for _ in range(iteration):
+            labels = []
+            wcss = 0
+            for di in range(len(data_input)):
+                nearest_centroid_id = -1
+                nearest_distance = float("inf")
+                for ci in range(len(self.centroids)):
+                    distance_from_centroid = distance_func(data_input[di], self.centroids[ci])
+                    if nearest_distance > distance_from_centroid:
+                        nearest_distance = distance_from_centroid
+                        nearest_centroid_id = ci
+                if wcss_en:
+                    wcss += nearest_distance**2
+                labels.append(nearest_centroid_id)
+
+            for ci in range(len(self.centroids)):
+                #cluster = []
+                sum_data = np.array([0]*len(data_input[0]))
+                cluster_size = 0
+                for d, label in zip(data_input, labels):
+                    if label!=ci: continue
+                    #cluster.append(d)
+                    # TODO: get new centroid for custom distance_func
+                    sum_data = sum_data + np.array(d)
+                    cluster_size += 1
+                self.centroids[ci] = list(sum_data / cluster_size)
+            if DSciSetting().debug:
+                if len(data_input[0]) == 2:
+                    plt.scatter([d[0] for d in data_input], [d[1] for d in data_input], c=labels, cmap="viridis", alpha=0.5)
+                    plt.scatter([c[0] for c in self.centroids],
+                                [c[1] for c in self.centroids], marker="x", c="red", s=200, linewidths=3)
+                    plt.show()
+        if wcss_en:
+            return labels[:], wcss
+        else:
+            return labels[:]
 
 def kMeansPp(data_input, num_cluster, distance_func):
     import random
@@ -82,6 +141,9 @@ def kMeans(data_input, num_cluster, distance_func, iteration=10, wcss_en=False):
     else:
         return labels[:]
 
+def getLabel(data_input, centroids, distance_func):
+    # TODO
+    return
 
 def testKMeansPp():
     import random
