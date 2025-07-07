@@ -14,6 +14,7 @@ class FileIoSetting:
 
 chart_tag_map = {"time": "t",
                  "date": "t",
+                 "datetime": "t",
                  "open": "o",
                  "price": "c", "close": "c",
                  "low": "l",
@@ -68,7 +69,7 @@ class open_wait:
         #    print(f"[{os.path.basename(self.filename)}]: No exception occurred. Context exited cleanly.")
         return False # Ensure exceptions are propagated by default
 
-def readCsvChartDict(csv_path):
+def importCsvChartDict(csv_path):
     chart = {"t": [], "o": [], "h": [], "l": [], "c": [], "v": []}
     with open(csv_path, newline='') as f:
         reader = csv.reader(f, delimiter=',')        
@@ -89,7 +90,51 @@ def readCsvChartDict(csv_path):
         #chart["o"][1:] = chart["c"][:-1]
         #for s in "tochlv":
         #    chart[s] = chart[s][1:]
+    if len(chart["v"])==0:
+        del chart["v"]
     return chart
 
+
+def importReversedCsvChartDict(csv_path):
+    chart = {"t": [], "o": [], "h": [], "l": [], "c": [], "v": []}
+    with open(csv_path, newline='') as f:
+        reader = csv.reader(f, delimiter=',')        
+        first_row = next(reader)
+        first_row = [f.lower() for f in first_row]
+        for row in reader:
+            for ri, header in enumerate(first_row):
+                k = chart_tag_map[header]
+                if k=="t":
+                    try:
+                        chart["t"].append(datetime.datetime.strptime(row[ri], "%Y-%m-%d %H:%M:%S"))
+                    except:
+                        chart["t"].append(datetime.datetime.strptime(row[ri], "%Y-%m-%d"))
+                elif k=="v":
+                    chart[k].append(float(row[ri]))
+                else:
+                    chart[k].append(1/float(row[ri]))
+            #print(row)
+        # Error
+        #chart["o"][1:] = chart["c"][:-1]
+        #for s in "tochlv":
+        #    chart[s] = chart[s][1:]
+    if len(chart["v"])==0:
+        del chart["v"]
+    return chart
+
+def exportCsvChart(chart, csv_path):
+    if type(chart)==dict:
+        with open(csv_path, "w") as fout:
+            if "v" in chart:
+                fout.writelines("Datetime,Open,High,Low,Price,Volume\n")
+                for ti in range(len(chart["t"])):
+                    fout.writelines(f'{chart["t"][ti].strftime("%Y-%m-%d %H:%M:%S")},'
+                                    f'{chart["o"][ti]},{chart["h"][ti]},{chart["l"][ti]},{chart["c"][ti]},{chart["v"][ti]}\n')
+            else:
+                fout.writelines("Datetime,Open,High,Low,Price\n")
+                for ti in range(len(chart["t"])):
+                    fout.writelines(f'{chart["t"][ti].strftime("%Y-%m-%d %H:%M:%S")},{chart["o"][ti]},{chart["h"][ti]},{chart["l"][ti]},{chart["c"][ti]}\n')
+            
+
 # TODO: merge
-# TODO: 
+# TODO: resolution adjust
