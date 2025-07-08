@@ -1,3 +1,5 @@
+from math import exp
+import datetime
 
 def singleton(cls):
     instances = {}
@@ -35,4 +37,74 @@ def transpose(l_2d):
     for c in range(n_col):
         row = [l_2d[r][c] for r in range(n_row)]
         transposed.append(row[:])
-    return transposed
+    return transposed[:]
+
+def sigmoid(x):
+    return 1 / (1 + exp(-x))
+
+def getDst(region,tick):
+    # In Seoul time
+    if region=="US":
+        if datetime.datetime(2026,3,8)<tick<datetime.datetime(2026,11,1):
+            return True
+        elif datetime.datetime(2025,3,9)<tick<datetime.datetime(2025,11,2):
+            return True
+        elif datetime.datetime(2024,3,10)<tick<datetime.datetime(2024,11,3):
+            return True
+        elif datetime.datetime(2023,3,12)<tick<datetime.datetime(2023,11,5):
+            return True
+        elif datetime.datetime(2022,3,13)<tick<datetime.datetime(2022,11,6):
+            return True
+        elif datetime.datetime(2021,3,14)<tick<datetime.datetime(2021,11,7):
+            return True
+    elif region=="EU":
+        if datetime.datetime(2026,3,29)<tick<datetime.datetime(2026,10,27):
+            return True
+        elif datetime.datetime(2025,3,30)<tick<datetime.datetime(2025,10,26):
+            return True
+        elif datetime.datetime(2024,3,21)<tick<datetime.datetime(2024,10,27):
+            return True
+        elif datetime.datetime(2023,3,26)<tick<datetime.datetime(2023,10,29):
+            return True
+        elif datetime.datetime(2022,3,27)<tick<datetime.datetime(2022,10,30):
+            return True
+        elif datetime.datetime(2021,3,28)<tick<datetime.datetime(2021,10,31):
+            return True
+        elif datetime.datetime(2020,3,29)<tick<datetime.datetime(2020,10,25):
+            return True
+        elif datetime.datetime(2019,3,31)<tick<datetime.datetime(2019,10,27):
+            return True
+        elif datetime.datetime(2018,3,25)<tick<datetime.datetime(2018,10,28):
+            return True
+        elif datetime.datetime(2017,3,26)<tick<datetime.datetime(2017,10,29):
+            return True
+        elif datetime.datetime(2016,3,27)<tick<datetime.datetime(2016,10,30):
+            return True
+        elif datetime.datetime(2015,3,29)<tick<datetime.datetime(2015,10,31):
+            return True
+        elif datetime.datetime(2014,3,30)<tick<datetime.datetime(2014,10,25):
+            return True
+        elif datetime.datetime(2013,3,31)<tick<datetime.datetime(2013,10,27):
+            return True
+        elif datetime.datetime(2012,3,25)<tick<datetime.datetime(2012,10,28):
+            return True
+        elif datetime.datetime(2011,3,27)<tick<datetime.datetime(2011,10,30):
+            return True
+        elif datetime.datetime(2010,3,28)<tick<datetime.datetime(2010,10,31):
+            return True
+    elif region=="AU":
+        if datetime.datetime(2023,10,1)<tick<datetime.datetime(2024,4,7):
+            return True
+        elif datetime.datetime(2022,10,2)<tick<datetime.datetime(2023,4,2):
+            return True
+        elif datetime.datetime(2021,10,3)<tick<datetime.datetime(2022,4,3):
+            return True
+    elif region=="NZ":
+        if datetime.datetime(2023,9,24)<tick<datetime.datetime(2024,4,7):
+            return True
+        elif datetime.datetime(2022,9,25)<tick<datetime.datetime(2023,4,2):
+            return True
+        elif datetime.datetime(2021,9,26)<tick<datetime.datetime(2022,4,3):
+            return True
+
+    return False

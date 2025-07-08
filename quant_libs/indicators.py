@@ -381,7 +381,7 @@ def mdd(profits, geometric=True):
     return mdd
 
 def sharpe(profits, ticks, trange, tunit):
-    if len(ticks) == 0:
+    if len(ticks) <= 1:
         return 0
     profits_by_t = []
     tick = trange[0]+tunit
