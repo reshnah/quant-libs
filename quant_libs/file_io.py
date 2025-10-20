@@ -95,6 +95,7 @@ def importCsvChartDict(csv_path):
     return chart
 
 
+
 def importReversedCsvChartDict(csv_path):
     chart = {"t": [], "o": [], "h": [], "l": [], "c": [], "v": []}
     with open(csv_path, newline='') as f:

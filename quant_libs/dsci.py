@@ -19,7 +19,7 @@ class Kmeans:
         self.feature_weight = []
         return
     
-    def getLabel(self, data_input):
+    def getLabelAndDist(self, data_input):
         nearest_distance = float("inf")
         label = -1
         for ci, centroid in enumerate(self.centroids):
@@ -27,6 +27,10 @@ class Kmeans:
             if nearest_distance > dist:
                 nearest_distance = dist
                 label = ci
+        return label, nearest_distance
+    
+    def getLabel(self, data_input):
+        label, dist = self.getLabelAndDist(data_input)
         return label
 
     def kMeans(self, data_input, num_cluster, distance_func, iteration=10, wcss_en=False):

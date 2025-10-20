@@ -18,6 +18,15 @@ def stdev(l):
     m = avg(l)
     return (sum((ll-m)**2 for ll in l)/len(l))**0.5
 
+def interquartile(l):
+    if len(l)==0: return 0
+    elif len(l)==1: return [l]*3
+    elif len(l)==2: return [min(l), (l[0]+l[1])/2, max(l)]
+    ll = l[:]
+    ll.sort()
+    return [ll[len(ll)//4], ll[len(ll)//2], ll[len(ll)*3//4]]
+
+
 def positiveRatio(l):
     if len(l) == 0: return 0
     return sum(ll > 0 for ll in l) / len(l)
@@ -108,3 +117,12 @@ def getDst(region,tick):
             return True
 
     return False
+
+def trimDictChart(chart, from_date, to_date):
+    keys = list(chart)
+    #keys.remove("t")
+    for ti in reversed(range(len(chart["t"]))):
+        if chart["t"][ti] > to_date or chart["t"][ti] < from_date:
+            for k in keys:
+                del chart[k][ti]
+    return chart

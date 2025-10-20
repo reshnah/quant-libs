@@ -9,7 +9,7 @@ class LoggerSetting:
     def __init__(self):
         return
 
-def strTime():
+def strNow():
     s = "[" + time.strftime("%H:%M:%S", time.localtime()) + "]"
     return s
 
@@ -25,7 +25,7 @@ def datetimeToday():
     return datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
 
 def std_log(s):
-    print(strTime()+s)
+    print(strNow()+s)
     fout = open(LoggerSetting().log_path+"log%s.txt"%(strToday(6)), "a")
-    fout.writelines(strTime+s+"\n")
+    fout.writelines(strNow+s+"\n")
     fout.close()

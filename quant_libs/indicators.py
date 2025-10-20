@@ -1,4 +1,5 @@
 from quant_libs.utils import *
+import sys
 
 @singleton
 class IndicatorSetting:
@@ -213,7 +214,7 @@ def bollingerBand(chart, params=[14, 2]):
     if IndicatorSetting().return_dict:
         return {"upper":upper[:], "lower":lower[:],"pb":pb[:]}
     else:
-        return (upper[:], lower[:])
+        return (upper[:], lower[:], pb[:])
     
 def williamsPR(chart, params=[14]):
     # KW verified
@@ -230,9 +231,9 @@ def ultimateOsc(chart, params=[14, 21, 28]):
     for ti in range(len(chart["c"])):
         bps = [chart["c"][ti]-min(chart["c"][max(0, ti-1)], chart["l"][ti])]+bps[0:-1]
         trs = [max(chart["c"][max(0, ti-1)], chart["h"][ti])-min(chart["c"][max(0, ti-1)], chart["l"][ti])]+trs[0:-1]
-        avg0 = sum(bps[0:params[0]])/sum(trs[0:params[0]])
-        avg1 = sum(bps[0:params[1]])/sum(trs[0:params[1]])
-        avg2 = sum(bps[0:params[2]])/sum(trs[0:params[2]])
+        avg0 = sum(bps[0:params[0]])/sum(trs[0:params[0]] + [0.00001])
+        avg1 = sum(bps[0:params[1]])/sum(trs[0:params[1]] + [0.00001])
+        avg2 = sum(bps[0:params[2]])/sum(trs[0:params[2]] + [0.00001])
         UO.append(100*(avg0*4+avg1*2+avg2*1)/7)
     return UO[:]
 
@@ -393,5 +394,5 @@ def sharpe(profits, ticks, trange, tunit):
             ticks = ticks[1:]
         profits_by_t.append(profit)
         tick = tick+tunit
-
+    if len(profits_by_t)<=1: return 0
     return sum(profits_by_t)/len(profits_by_t)/stdev(profits_by_t)
