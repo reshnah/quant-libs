@@ -48,8 +48,12 @@ def transpose(l_2d):
         transposed.append(row[:])
     return transposed[:]
 
-def sigmoid(x):
-    return 1 / (1 + exp(-x))
+def sigmoid(x, a=1):
+    try:
+        return 1/(1+exp(-x*a))
+    except:
+        print(x)
+        raise
 
 def getDst(region,tick):
     # In Seoul time
