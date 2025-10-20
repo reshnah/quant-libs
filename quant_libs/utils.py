@@ -130,3 +130,9 @@ def trimDictChart(chart, from_date, to_date):
             for k in keys:
                 del chart[k][ti]
     return chart
+
+def isKrHoliday(dt):
+    holidays = ["241225","250101","250128","250129","250130","250303","250405","250505","250506","250606","250815","251003",
+                "251006","251007","251008","251009",]
+    dt_str = dt.strftime("%y%m%d")
+    return dt_str in holidays
