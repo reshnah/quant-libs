@@ -39,6 +39,14 @@ def sign(n):
     else:
         return 0
 
+def softThreshold(x, a):
+    if x > a:
+        return x-a
+    elif x < -a:
+        return x+a
+    else:
+        return 0
+
 def transpose(l_2d):
     n_row = len(l_2d)
     n_col = len(l_2d[0])
