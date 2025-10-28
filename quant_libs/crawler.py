@@ -8,33 +8,34 @@ import time
 
 
 def getUsTickers(listed_idx=None):
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-    }
     if listed_idx is None:
         listed_idx = ["DJ", "NQ100", "SP500"]
     tickers = []
     if "DJ" in listed_idx:
         url = "https://en.wikipedia.org/wiki/Dow_Jones_Industrial_Average"
-        response = requests.get(url, headers=headers)
-        t = list(pd.read_html(response.text)[2]["Symbol"])
-        tickers = list(set(tickers + t))
+        tickers = list(set(tickers + getWikiTickers(url, 2, "Symbol")))
     if "NQ100" in listed_idx:
         url = "https://en.wikipedia.org/wiki/Nasdaq-100"
-        response = requests.get(url, headers=headers)
-        #t = list(pd.read_html(url, header=0)[4]["Symbol"])
-        t = list(pd.read_html(response.text)[4]["Ticker"])
-        tickers = list(set(tickers + t))
+        tickers = list(set(tickers + getWikiTickers(url, 4, "Ticker")))
     if "SP500" in listed_idx:
         url = 'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies'
-        response = requests.get(url, headers=headers)
-        t = list(pd.read_html(response.text)[0]["Symbol"])
-        tickers = list(set(tickers + t))
+        tickers = list(set(tickers + getWikiTickers(url, 0, "Symbol")))
 
-    for i in range(len(tickers)):
-        ticker = tickers[i]
-        tickers[i] = ticker.replace(".","-")
     return tickers[:]
+
+def getKospi200Tickers():
+    return getWikiTickers("https://en.wikipedia.org/wiki/KOSPI_200", 2, "Symbol")
+
+def getWikiTickers(url, table_idx, table_column):
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    }
+    response = requests.get(url, headers=headers)
+    t = list(pd.read_html(response.text,
+                          converters={table_column: str}
+                          )[table_idx][table_column])
+    tickers = list(set(t))
+    return [t.replace(".", "-") for t in tickers]
 
 def getChart(ticker,from_date,to_date=None):
     if isinstance(from_date, datetime.datetime):
@@ -203,3 +204,9 @@ def getKrxTopVolumeList(num, date=None):
         raise ValueError
     df = df.sort_values(by=['거래대금'], ascending=False)
     return list(df.index)[:num]
+
+def test():
+    getKospi200Tickers()
+
+if __name__=="__main__":
+    test()
