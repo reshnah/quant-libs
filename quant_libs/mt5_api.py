@@ -332,22 +332,26 @@ class MT5():
         return chart
 
 
-    def getTickChart(self,symbol,interval,start_t=None,end_t=None,dst_adjust=None,length=99999):
-        
+    def spAdjust(self, symbol):
+        if self.server.startswith("ICMarkets"):
+            commission = 0.00035 / (self.getPriceOverUsd(symbol[3:])+sys.float_info.min) / 10
+            return commission
+        return 0
+
+
+    def getTickChart(self,symbol,start_t=None,end_t=None,dst_adjust=None,length=99999):
+        chart = {"bid":[],"ask":[],"price":[],"sp":[],"t":[]}
         while True:
-            result = mt5.copy_ticks_from(symbol, )
-            if not start_t is None:
-                if not end_t is None:
-                    result = mt5.copy_rates_from(symbol, interval, end_t, int((end_t - start_t)/delta+0.999))
-                else:
-                    # TODO
-                    result = mt5.copy_rates_from_pos(symbol, interval, 0, int((datetime.datetime.utcnow()+datetime.timedelta(hours=12)+self.time_offset - start_t)/delta+0.999))
-            else:
-                if not end_t is None:
-                    result = mt5.copy_rates_from(symbol, interval, end_t, length)
-                else:
-                    result = mt5.copy_rates_from_pos(symbol, interval, 0, length)
+            result = mt5.copy_ticks_from(symbol, 0, length, mt5.COPY_TICKS_ALL)
             if not result is None:
                 break
             time.sleep(5)
-        return
+        sp_adjust = self.spAdjust(symbol)
+        for r in result:
+            chart["bid"].append(r[1]-sp_adjust)
+            chart["ask"].append(r[2]+sp_adjust)
+            chart["t"].append(self.convTs2Dt(r[5]/1000))
+            chart["sp"].append(chart["ask"][-1]-chart["bid"][-1])
+            chart["price"].append((r[1]+r[2])/2)
+        
+        return chart
