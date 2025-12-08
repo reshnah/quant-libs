@@ -1,6 +1,7 @@
 from quant_libs.utils import *
 import numpy as np
 from matplotlib import pyplot as plt
+from typing import List, Union
 
 @singleton
 class DSciSetting:
@@ -243,4 +244,74 @@ def testKMeansWcss2():
     plt.show()
 
     plt.plot(n_clusters, np.array(wcsses)*(np.array(n_clusters)**0.5), marker=".")
+    plt.show()
+
+def testDistribution(
+    data: List[Union[int, float]],
+    interval: Union[int, float],
+    title: str = "Line Graph Histogram (Frequency Polygon)",
+    xlabel: str = "Data Values (Bins)",
+    ylabel: str = "Frequency (Count)"
+) -> None:
+    """
+    Calculates and plots a histogram as a line graph (frequency polygon).
+
+    Args:
+        data: A list of numeric data points.
+        interval: The width of the bins (bin size).
+        title: The title for the plot.
+        xlabel: The label for the x-axis.
+        ylabel: The label for the y-axis.
+    """
+    if not data:
+        print("Error: The data list is empty.")
+        return
+
+    # Determine the bins based on the specified interval
+    data.sort()
+    min_val = min(data)
+    max_val = max(data)
+    avg_val = avg(data)
+    avg90_val = avg(data[len(data)//20:len(data)-len(data)//20])
+    avg50_val = avg(data[len(data)//4:len(data)-len(data)//4])
+    avg80_val = avg(data[len(data)//10:len(data)-len(data)//10])
+    # Ensure bins cover the entire range. Add a small epsilon to the max for safety.
+    bins = np.arange(min_val, max_val + interval * 1.01, interval)
+
+    # 1. Calculate the histogram data
+    # 'hist' contains the counts, 'bin_edges' contains the boundaries
+    hist, bin_edges = np.histogram(data, bins=bins)
+
+    # 2. Calculate the midpoint for each bin
+    # The line graph plots frequency against the midpoint of the bin
+    bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
+
+    # 3. Create the plot
+    plt.figure(figsize=(10, 6))
+    
+    # Plot the frequency polygon (line graph)
+    plt.plot(bin_centers, hist, marker='o', linestyle='-', linewidth=2)
+    
+    # Add optional styling and labels
+    plt.title(title, fontsize=16)
+    plt.xlabel(xlabel, fontsize=14)
+    plt.ylabel(ylabel, fontsize=14)
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+
+
+    position = 1.
+    for (a, color, txt) in [(avg_val, "#000000", "Avg: "),
+                               (avg90_val, "#101010", "Avg90: "),
+                               (avg80_val, "#202020", "Avg80: "),
+                               (avg50_val, "#303030", "Avg50: ")]:
+        plt.plot([a, a], [0, max(hist)], color=color, linestyle='--')
+        plt.text(a, max(hist)*position, f"{txt}{a}", color=color)
+        position *= 0.95
+
+    
+    # Ensure x-ticks align somewhat with the bin centers/edges
+    # This is a good general approach but can be adjusted
+    #plt.xticks(bin_centers, rotation=45, ha='right') 
+    
+    #plt.tight_layout()
     plt.show()

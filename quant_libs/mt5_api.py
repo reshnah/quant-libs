@@ -17,6 +17,7 @@ class MT5():
     server = ""
     company = ""
     margin_free = 0
+    default_commission = 0.
 
     def __init__(self,login=None,server=None,password=None):
         if login is None:
@@ -31,6 +32,18 @@ class MT5():
         self.server = acc_info.server
         self.company = acc_info.company
         self.margin_free = acc_info.margin_free
+        
+    def getFreeMargin(self):
+        return mt5.account_info().margin_free
+    
+    def getForexSymbols(self):
+        fx_symbols = []
+        symbols = mt5.symbols_get()
+        # ICMarkets
+        for s in symbols:
+            if "Forex" in s.path:
+                fx_symbols.append(s.name)
+        return fx_symbols
     def getDst(self):
         return False
 
@@ -63,27 +76,35 @@ class MT5():
     def getPrice(self, pair):
         info = mt5.symbol_info(pair)
         return (info.bid + info.ask) / 2
+    def getBid(self, pair):
+        info = mt5.symbol_info(pair)
+        return info.bid
+    def getAsk(self, pair):
+        info = mt5.symbol_info(pair)
+        return info.ask
     def getPriceOverUsd(self, currency):
         if currency=="USD":
             return 1.
         elif currency in ["EUR","GBP","AUD","NZD"]:
             info = mt5.symbol_info(currency+"USD")
-            return (info.bid+info.ask)/2
+            return (info.bid+info.ask+sys.float_info.min)/2
         else:
             info = mt5.symbol_info("USD"+currency)
             if currency=="JPY":
-                return 2 / (info.bid + info.ask) * 100
+                return 2 / (info.bid + info.ask+sys.float_info.min) * 100
             else:
-                return 2 / (info.bid + info.ask)
+                return 2 / (info.bid + info.ask+sys.float_info.min)
     def getCommissionRatio(self,symbol):
         info = mt5.symbol_info(symbol)
         price = (info.bid + info.ask)/2
         spread = (info.ask - info.bid)
         commission = self.getPureCommission(symbol)
         #print(spread, commission, price)
-        return (spread+commission)/price
+        return (spread+commission)/(price+sys.float_info.min)
+    def setDefaultCommission(self, commission):
+        self.default_commission = commission
     def getPureCommission(self, symbol):
-        commission = 0.00004 / self.getPriceOverUsd(symbol[3:])
+        commission = self.default_commission / (self.getPriceOverUsd(symbol[3:])+sys.float_info.min)
         return commission
     def getUnit(self, symbol):
         info = mt5.symbol_info(symbol)
@@ -142,7 +163,7 @@ class MT5():
             req["position"] = close_by
         if not comment is None:
             req["comment"] = str(comment)
-        req["type_filling"] = mt5.ORDER_FILLING_FOK
+        req["type_filling"] = mt5.ORDER_FILLING_IOC
         while True:
             result = mt5.order_send(req)
             time.sleep(0.1)
@@ -214,9 +235,8 @@ class MT5():
             return False
         else:
             return True
-
-
-    def getChart(self,symbol,interval,start_t=None,end_t=None,dst_adjust=None,length=99999):
+    
+    def convStr2Timedelta(self, interval):
         if interval=="1m":
             interval = mt5.TIMEFRAME_M1
             delta = datetime.timedelta(minutes=1)
@@ -252,6 +272,30 @@ class MT5():
             delta = datetime.timedelta(days=7)
         else:
             raise NotImplementedError
+        return delta
+    def convTs2Dt(self, ts, dst_adjust=None):
+        if getDst("US",datetime.datetime.fromtimestamp(ts)):
+            dt = datetime.datetime.fromtimestamp(ts)-datetime.timedelta(hours=12)
+        else:
+            dt = datetime.datetime.fromtimestamp(ts)-datetime.timedelta(hours=11)
+        
+        if self.timezone=="KR":
+            dt = dt + datetime.timedelta(hours=9)
+        
+        
+        if not dst_adjust is None:
+            # Current DST
+            if getDst(dst_adjust,datetime.datetime.now()):
+                if not getDst(dst_adjust,dt):
+                    dt = dt-datetime.timedelta(hours=1)
+            # Current not DST
+            else:
+                if getDst(dst_adjust,dt):
+                    dt = dt+datetime.timedelta(hours=1)
+        return dt
+    def getChart(self,symbol,interval,start_t=None,end_t=None,dst_adjust=None,length=99999):
+        delta = self.convStr2Timedelta(interval)
+
         while True:
             if not start_t is None:
                 if not end_t is None:
@@ -271,19 +315,11 @@ class MT5():
         tick_size = mt5.symbol_info(symbol).trade_tick_size
         for r in result:
             chart["sp"].append(float(r[6])*tick_size)
-            # Align with UTC first
-            if getDst("US",datetime.datetime.fromtimestamp(r[0])):
-                chart["t"].append(datetime.datetime.fromtimestamp(r[0])-datetime.timedelta(hours=12))
-            else:
-                chart["t"].append(datetime.datetime.fromtimestamp(r[0])-datetime.timedelta(hours=11))
-            chart["o"].append(float(r[1])+tick_size/2)
-            chart["h"].append(float(r[2])+tick_size/2)
-            chart["l"].append(float(r[3])+tick_size/2)
-            chart["c"].append(float(r[4])+tick_size/2)
-
-        if self.timezone=="KR":
-            for ti in range(len(chart["t"])):
-                chart["t"][ti] = chart["t"][ti] + datetime.timedelta(hours=9)
+            chart["t"].append(self.convTs2Dt(r[0], dst_adjust))
+            chart["o"].append(float(r[1])+tick_size/2*chart["sp"][-1])
+            chart["h"].append(float(r[2])+tick_size/2*chart["sp"][-1])
+            chart["l"].append(float(r[3])+tick_size/2*chart["sp"][-1])
+            chart["c"].append(float(r[4])+tick_size/2*chart["sp"][-1])
 
         if chart["t"][0] > chart["t"][len(chart["t"]) - 1]:
             chart["t"].reverse()
@@ -293,17 +329,25 @@ class MT5():
             chart["c"].reverse()
             chart["sp"].reverse()
 
-
-
-        if not dst_adjust is None:
-            # Current DST
-            if getDst(dst_adjust,datetime.datetime.now()):
-                for ti in range(len(chart["t"])):
-                    if not getDst(dst_adjust,chart["t"][ti]):
-                        chart["t"][ti] = chart["t"][ti]-datetime.timedelta(hours=1)
-            # Current not DST
-            else:
-                for ti in range(len(chart["t"])):
-                    if getDst(dst_adjust,chart["t"][ti]):
-                        chart["t"][ti] = chart["t"][ti]+datetime.timedelta(hours=1)
         return chart
+
+
+    def getTickChart(self,symbol,interval,start_t=None,end_t=None,dst_adjust=None,length=99999):
+        
+        while True:
+            result = mt5.copy_ticks_from(symbol, )
+            if not start_t is None:
+                if not end_t is None:
+                    result = mt5.copy_rates_from(symbol, interval, end_t, int((end_t - start_t)/delta+0.999))
+                else:
+                    # TODO
+                    result = mt5.copy_rates_from_pos(symbol, interval, 0, int((datetime.datetime.utcnow()+datetime.timedelta(hours=12)+self.time_offset - start_t)/delta+0.999))
+            else:
+                if not end_t is None:
+                    result = mt5.copy_rates_from(symbol, interval, end_t, length)
+                else:
+                    result = mt5.copy_rates_from_pos(symbol, interval, 0, length)
+            if not result is None:
+                break
+            time.sleep(5)
+        return

@@ -1,4 +1,4 @@
-from quant_libs.utils import *
+from quant_libs.singleton import singleton
 import time
 import datetime
 
@@ -24,8 +24,8 @@ def strToday(length = 6):
 def datetimeToday():
     return datetime.datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
 
-def std_log(s):
+def stdLog(s):
     print(strNow()+s)
     fout = open(LoggerSetting().log_path+"log%s.txt"%(strToday(6)), "a")
-    fout.writelines(strNow+s+"\n")
+    fout.writelines(strNow()+s+"\n")
     fout.close()

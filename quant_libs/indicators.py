@@ -371,7 +371,7 @@ def vwap(chart):
             vwaps.append(cumulative_tpv/cumulative_v)
     return vwaps
 
-def mdd(profits, geometric=True):
+def getMdd(profits, geometric=True):
     max_deposit = 1.
     deposit = 1.
     mdd = 0.
@@ -381,7 +381,7 @@ def mdd(profits, geometric=True):
         mdd = min(mdd, deposit/max_deposit-1)
     return mdd
 
-def sharpe(profits, ticks, trange, tunit):
+def getSharpe(profits, ticks, trange, tunit):
     if len(ticks) <= 1:
         return 0
     profits_by_t = []
@@ -396,3 +396,20 @@ def sharpe(profits, ticks, trange, tunit):
         tick = tick+tunit
     if len(profits_by_t)<=1: return 0
     return sum(profits_by_t)/len(profits_by_t)/stdev(profits_by_t)
+
+def getCProfit(profits, geometric=True):
+    if geometric:
+        cprofits = [1.]
+        for p in profits:
+            cprofits.append(cprofits[-1] * (p+1))
+    else:
+        cprofits = [0.]
+        for p in profits:
+            cprofits.append(cprofits[-1] + p)
+    
+    return cprofits[1:]
+
+def sortByTick(profits, tprofits):
+    combined_sorted = sorted(zip(tprofits, profits))
+    tprofits, profits = zip(*combined_sorted)
+    return profits, tprofits
