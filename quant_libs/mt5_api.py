@@ -32,6 +32,7 @@ class MT5():
         self.server = acc_info.server
         self.company = acc_info.company
         self.margin_free = acc_info.margin_free
+        self.acc_info = acc_info
         
     def getFreeMargin(self):
         return mt5.account_info().margin_free
@@ -82,6 +83,16 @@ class MT5():
     def getAsk(self, pair):
         info = mt5.symbol_info(pair)
         return info.ask
+    def getSpread(self, pair):
+        info = mt5.symbol_info(pair)
+        return info.ask-info.bid
+    def getUsualSpread(self, pair, usuality=.99):
+        lookback = 10000
+        chart = self.getTickChart(pair, length=lookback)
+        sps = chart["sp"]
+        sps.sort()
+        usual_sp = sps[-int(len(sps)*usuality)]
+        return usual_sp
     def getPriceOverUsd(self, currency):
         if currency=="USD":
             return 1.
@@ -91,13 +102,21 @@ class MT5():
         else:
             info = mt5.symbol_info("USD"+currency)
             if currency=="JPY":
-                return 2 / (info.bid + info.ask+sys.float_info.min) * 100
+                return 2 / (info.bid + info.ask+sys.float_info.min)
             else:
                 return 2 / (info.bid + info.ask+sys.float_info.min)
     def getCommissionRatio(self,symbol):
         info = mt5.symbol_info(symbol)
         price = (info.bid + info.ask)/2
         spread = (info.ask - info.bid)
+        commission = self.getPureCommission(symbol)
+        #print(spread, commission, price)
+        return (spread+commission)/(price+sys.float_info.min)
+    def getUsualCommissionRatio(self,symbol, usuality=.99):
+        info = mt5.symbol_info(symbol)
+        price = (info.bid + info.ask)/2
+        spread = self.getUsualSpread(symbol, usuality)
+        #spread = (info.ask - info.bid)
         commission = self.getPureCommission(symbol)
         #print(spread, commission, price)
         return (spread+commission)/(price+sys.float_info.min)
@@ -160,7 +179,7 @@ class MT5():
         if not stop_loss is None:
             req["sl"] = round(stop_loss,digits)
         if not close_by is None:
-            req["position"] = close_by
+            req["position"] = int(close_by)
         if not comment is None:
             req["comment"] = str(comment)
         req["type_filling"] = mt5.ORDER_FILLING_IOC
@@ -236,43 +255,59 @@ class MT5():
         else:
             return True
     
-    def convStr2Timedelta(self, interval):
+    def convStrInterval2Delta(self, interval):
         if interval=="1m":
-            interval = mt5.TIMEFRAME_M1
             delta = datetime.timedelta(minutes=1)
         elif interval=="5m":
-            interval = mt5.TIMEFRAME_M5
             delta = datetime.timedelta(minutes=5)
         elif interval=="15m":
-            interval = mt5.TIMEFRAME_M15
             delta = datetime.timedelta(minutes=15)
         elif interval=="30m":
-            interval = mt5.TIMEFRAME_M30
             delta = datetime.timedelta(minutes=30)
         elif interval=="1h" or interval=="60m":
-            interval = mt5.TIMEFRAME_H1
             delta = datetime.timedelta(minutes=60)
         elif interval=="2h" or interval=="120m":
-            interval = mt5.TIMEFRAME_H2
             delta = datetime.timedelta(minutes=120)
         elif interval=="3h" or interval=="180m":
-            interval = mt5.TIMEFRAME_H3
             delta = datetime.timedelta(minutes=180)
         elif interval=="4h" or interval=="240m":
-            interval = mt5.TIMEFRAME_H4
             delta = datetime.timedelta(minutes=240)
         elif interval=="6h" or interval=="360m":
-            interval = mt5.TIMEFRAME_H6
             delta = datetime.timedelta(minutes=360)
         elif interval=="1d" or interval=="24h":
-            interval = mt5.TIMEFRAME_D1
             delta = datetime.timedelta(days=1)
         elif interval=="1w" or interval=="7d" or interval=="168h":
-            interval = mt5.TIMEFRAME_W1
             delta = datetime.timedelta(days=7)
         else:
             raise NotImplementedError
         return delta
+    
+    def convStrInterval2Int(self, interval):
+        if interval=="1m":
+            interval = mt5.TIMEFRAME_M1
+        elif interval=="5m":
+            interval = mt5.TIMEFRAME_M5
+        elif interval=="15m":
+            interval = mt5.TIMEFRAME_M15
+        elif interval=="30m":
+            interval = mt5.TIMEFRAME_M30
+        elif interval=="1h" or interval=="60m":
+            interval = mt5.TIMEFRAME_H1
+        elif interval=="2h" or interval=="120m":
+            interval = mt5.TIMEFRAME_H2
+        elif interval=="3h" or interval=="180m":
+            interval = mt5.TIMEFRAME_H3
+        elif interval=="4h" or interval=="240m":
+            interval = mt5.TIMEFRAME_H4
+        elif interval=="6h" or interval=="360m":
+            interval = mt5.TIMEFRAME_H6
+        elif interval=="1d" or interval=="24h":
+            interval = mt5.TIMEFRAME_D1
+        elif interval=="1w" or interval=="7d" or interval=="168h":
+            interval = mt5.TIMEFRAME_W1
+        else:
+            raise NotImplementedError
+        return interval
     def convTs2Dt(self, ts, dst_adjust=None):
         if getDst("US",datetime.datetime.fromtimestamp(ts)):
             dt = datetime.datetime.fromtimestamp(ts)-datetime.timedelta(hours=12)
@@ -294,7 +329,8 @@ class MT5():
                     dt = dt+datetime.timedelta(hours=1)
         return dt
     def getChart(self,symbol,interval,start_t=None,end_t=None,dst_adjust=None,length=99999):
-        delta = self.convStr2Timedelta(interval)
+        delta = self.convStrInterval2Delta(interval)
+        interval = self.convStrInterval2Int(interval)
 
         while True:
             if not start_t is None:
@@ -316,10 +352,10 @@ class MT5():
         for r in result:
             chart["sp"].append(float(r[6])*tick_size)
             chart["t"].append(self.convTs2Dt(r[0], dst_adjust))
-            chart["o"].append(float(r[1])+tick_size/2*chart["sp"][-1])
-            chart["h"].append(float(r[2])+tick_size/2*chart["sp"][-1])
-            chart["l"].append(float(r[3])+tick_size/2*chart["sp"][-1])
-            chart["c"].append(float(r[4])+tick_size/2*chart["sp"][-1])
+            chart["o"].append(float(r[1])+chart["sp"][-1]/2)
+            chart["h"].append(float(r[2])+chart["sp"][-1]/2)
+            chart["l"].append(float(r[3])+chart["sp"][-1]/2)
+            chart["c"].append(float(r[4])+chart["sp"][-1]/2)
 
         if chart["t"][0] > chart["t"][len(chart["t"]) - 1]:
             chart["t"].reverse()
@@ -347,6 +383,8 @@ class MT5():
                 break
             time.sleep(5)
         sp_adjust = self.spAdjust(symbol)
+        if symbol.endswith("JPY"):
+            sp_adjust /= 10
         for r in result:
             chart["bid"].append(r[1]-sp_adjust)
             chart["ask"].append(r[2]+sp_adjust)
@@ -355,3 +393,19 @@ class MT5():
             chart["price"].append((r[1]+r[2])/2)
         
         return chart
+    
+    def isSpreadNormalized(self, symbol, usuality=.99):
+        normalize_level = self.getUsualSpread(symbol, usuality)
+        sp = self.getSpread(symbol)
+        return sp < normalize_level
+    
+    def waitSpreadNormalization(self, symbol, timeout=300, usuality=.99):
+        normalize_level = self.getUsualSpread(symbol, usuality)
+        start_tick = datetime.datetime.now()
+        
+        while True:
+            sp = self.getSpread(symbol)
+            print(f"Target sp: {normalize_level} / Current sp: {sp}   ", end="\r")
+            if sp < normalize_level or datetime.datetime.now() > start_tick + datetime.timedelta(seconds=timeout):
+                break
+            time.sleep(1)
