@@ -371,12 +371,12 @@ def vwap(chart):
             vwaps.append(cumulative_tpv/cumulative_v)
     return vwaps
 
-def getMdd(profits, geometric=True):
+def getMdd(profits, leverage=1., geometric=True):
     max_deposit = 1.
     deposit = 1.
     mdd = 0.
     for p in profits:
-        deposit *= (p+1)
+        deposit *= (p*leverage+1)
         max_deposit = max(max_deposit, deposit)
         mdd = min(mdd, deposit/max_deposit-1)
     return mdd
@@ -397,15 +397,15 @@ def getSharpe(profits, ticks, trange, tunit):
     if len(profits_by_t)<=1: return 0
     return sum(profits_by_t)/len(profits_by_t)/stdev(profits_by_t)
 
-def getCProfit(profits, geometric=True):
+def getCProfit(profits, leverage=1., geometric=True):
     if geometric:
         cprofits = [1.]
         for p in profits:
-            cprofits.append(cprofits[-1] * (p+1))
+            cprofits.append(cprofits[-1] * (p*leverage+1))
     else:
         cprofits = [0.]
         for p in profits:
-            cprofits.append(cprofits[-1] + p)
+            cprofits.append(cprofits[-1] + p*leverage)
     
     return cprofits[1:]
 
@@ -413,3 +413,23 @@ def sortByTick(profits, tprofits):
     combined_sorted = sorted(zip(tprofits, profits))
     tprofits, profits = zip(*combined_sorted)
     return profits, tprofits
+
+def findLeverage(profits, target_profit, leverage_range = (1, 1000)):
+    for leverage in range(leverage_range[0], leverage_range[1]):
+        profit = getCProfit(profits, leverage)[-1]
+        if profit >= target_profit:
+            leverage_init = leverage-0.5
+            break
+    leverage_step = 0.5
+    leverage = leverage_init
+    while leverage_step > 0.0001:
+        profit = getCProfit(profits, leverage)[-1]
+        if profit > target_profit:
+            leverage -= leverage_step
+        elif profit < target_profit:
+            leverage += leverage_step
+        else:
+            break
+        leverage_step /= 2
+
+    return leverage
