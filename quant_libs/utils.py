@@ -107,6 +107,15 @@ def sigmoid(x, a=1):
         print(x)
         raise
 
+def wAvg(l, ws):
+    if len(l)==0: return 0
+    return sum(ll*ww for ll, ww in zip(l, ws)) / sum(ws)
+
+def wStdev(l, ws):
+    if len(l)<=1: return 0
+    m = wAvg(l, ws)
+    return (sum(((ll-m)**2) * ww for ll, ww in zip(l, ws))/sum(ws))**0.5
+
 def getDst(region,tick):
     # In Seoul time
     if region=="US":
