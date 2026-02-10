@@ -52,6 +52,7 @@ class Binance():
     tick_sizes = {}
     qty_steps = {}
     min_qtys = {}
+    min_notional = {}
     leverages = {}
     last_prices = {}
     recv_window = 15000
@@ -305,13 +306,21 @@ class Binance():
                 elif f["filterType"] == "LOT_SIZE":
                     qty_step = float(f["stepSize"])
                     min_qty = float(f["minQty"])
+                elif self.exchange == "SPOT" and f["filterType"] == "NOTIONAL":
+                    min_notional = float(f["minNotional"])
+                elif self.exchange == "USDM" and f["filterType"] == "MIN_NOTIONAL":
+                    min_notional = float(f["notional"])
 
             self.tick_sizes[symbol] = tick_size
             self.qty_steps[symbol] = qty_step
             self.min_qtys[symbol] = min_qty
-            self.last_prices[symbol] = -1
+            self.min_notional[symbol] = min_notional
+            #self.last_prices[symbol] = -1
             # if exchange == "USDM":
             #    self.USDMChangeLeverage(symbol, leverage)
+    
+    def getMinQty(self, symbol):
+        return max(self.min_qtys[symbol], int(self.min_notional[symbol]/self.last_prices[symbol]/self.qty_steps[symbol]+0.99999)*self.qty_steps[symbol])
 
     def getChart(self,symbol,interval,start_t=0,end_t=0):
         if not interval in ["1m","3m","5m","15m","30m","1h","2h","4h","6h","8h","12h","1d","3d","1w","1M"]:
@@ -620,6 +629,32 @@ class Binance():
 
     def Sell(self,symbol,quantity,price,leverage=0,reduce_only=False,position="",priceMatch="NONE"):
         return self.NewOrder("SELL",symbol,quantity,price,leverage=leverage,reduce_only=reduce_only,position=position,priceMatch=priceMatch)
+    
+    def BuyChase(self,symbol,quantity,leverage=0,reduce_only=False,position="",refresh_period=1.):
+        result = self.NewOrder("BUY",symbol,quantity,0,leverage=leverage,reduce_only=reduce_only,position=position,priceMatch="QUEUE")
+        order_id = result["orderId"]
+        while True:
+            order_status = self.CheckOrder(symbol, order_id)
+            #print(order_status)
+            if order_status["status"]=="FILLED":
+                break
+            time.sleep(refresh_period)
+            result = self.OrderModify("BUY",symbol,order_id,quantity,0,priceMatch="QUEUE")
+        return order_status
+    def SellChase(self,symbol,quantity,leverage=0,reduce_only=False,position="",refresh_period=1.):
+        result = self.NewOrder("SELL",symbol,quantity,0,leverage=leverage,reduce_only=reduce_only,position=position,priceMatch="QUEUE")
+        order_id = result["orderId"]
+        #print(result)
+        while True:
+            order_status = self.CheckOrder(symbol, order_id)
+            #print(order_status)
+            if order_status["status"]=="FILLED":
+                break
+            time.sleep(refresh_period)
+            result = self.OrderModify("SELL",symbol,order_id,quantity,0,priceMatch="QUEUE")
+            #print("ordermodifu")
+            #print(result)
+        return order_status
 
     def NewOrder(self,side,symbol,quantity,price,leverage=0,reduce_only=False,position="",priceMatch="NONE"):
         if self.fake_trading:
