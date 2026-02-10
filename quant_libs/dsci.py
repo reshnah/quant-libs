@@ -2,6 +2,8 @@ from quant_libs.utils import *
 import numpy as np
 from matplotlib import pyplot as plt
 from typing import List, Union
+import dill
+import os
 
 @singleton
 class DSciSetting:
@@ -76,6 +78,19 @@ class Kmeans:
             return labels[:], wcss
         else:
             return labels[:]
+    
+    def exportKMeans(self, directory):
+        if not os.path.isdir(directory):
+            os.makedirs(directory)
+        with open(directory + "/dist_func.pkl", "wb") as fout:
+            dill.dump(self.distance_func, fout)
+        with open(directory + "/centroids.txt", "w") as fout:
+            fout.writelines(str(self.centroids))
+    def importKMeans(self, directory):
+        with open(directory + "/dist_func.pkl", "rb") as fin:
+            self.distance_func = dill.load(fin)
+        with open(directory + "/centroids.txt", "r") as fin:
+            self.centroids = eval(fin.readline())
 
 def kMeansPp(data_input, num_cluster, distance_func):
     import random
