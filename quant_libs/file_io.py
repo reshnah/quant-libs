@@ -3,6 +3,8 @@ import time, datetime
 import csv
 import psutil
 import os
+import pandas as pd
+from pathlib import Path
 
 @singleton
 class FileIoSetting:
@@ -135,7 +137,37 @@ def exportCsvChart(chart, csv_path):
                 fout.writelines("Datetime,Open,High,Low,Price\n")
                 for ti in range(len(chart["t"])):
                     fout.writelines(f'{chart["t"][ti].strftime("%Y-%m-%d %H:%M:%S")},{chart["o"][ti]},{chart["h"][ti]},{chart["l"][ti]},{chart["c"][ti]}\n')
-            
+
+def getFileUpdateDatetime(fname):
+    path = Path(fname)
+    
+    if path.exists():
+        # Get the last modification time (timestamp)
+        mtime = path.stat().st_mtime
+        
+        # Convert timestamp to a readable datetime object
+        readable_time = datetime.datetime.fromtimestamp(mtime)
+        
+        return readable_time
+    else:
+        print("File does not exist.")
+        return datetime.datetime(1970,1,1)
+
+def appendChartToDf(dst, chart: dict, symbol, how="inner") -> pd.DataFrame:
+    # how: "inner" / "outer"
+    df = pd.DataFrame.from_dict(chart)
+    columns = df.columns.values
+    rename_dict = {}
+    for c in columns:
+        if c!="t":
+            rename_dict[c] = symbol+c
+        else:
+            rename_dict[c] = c
+    df = df.rename(columns=rename_dict)
+    if dst is None:
+        return df
+    else:
+        return dst.merge(df, how=how, on="t")
 
 # TODO: merge
 # TODO: resolution adjust
