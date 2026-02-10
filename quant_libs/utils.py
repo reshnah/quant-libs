@@ -116,7 +116,7 @@ def wStdev(l, ws):
     m = wAvg(l, ws)
     return (sum(((ll-m)**2) * ww for ll, ww in zip(l, ws))/sum(ws))**0.5
 
-def getDst(region,tick):
+def getDst(region, tick: datetime.datetime):
     # In Seoul time
     if region=="US":
         if datetime.datetime(2026,3,8)<tick<datetime.datetime(2026,11,1):
@@ -183,7 +183,7 @@ def getDst(region,tick):
 
     return False
 
-def trimDictChart(chart, from_date, to_date):
+def trimDictChart(chart: dict, from_date, to_date):
     keys = list(chart)
     #keys.remove("t")
     for ti in reversed(range(len(chart["t"]))):
@@ -198,7 +198,7 @@ def isKrHoliday(dt):
     dt_str = dt.strftime("%y%m%d")
     return dt_str in holidays
 
-def getNextMonthFirstDate(dt):
+def getNextMonthFirstDate(dt: datetime.datetime):
     """
     Calculates the first day of the month following the given datetime object.
     Uses only the built-in 'datetime' module.
