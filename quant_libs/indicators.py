@@ -372,14 +372,52 @@ def vwap(chart):
     return vwaps
 
 def getMdd(profits, leverage=1., geometric=True):
-    max_deposit = 1.
-    deposit = 1.
-    mdd = 0.
-    for p in profits:
-        deposit *= (p*leverage+1)
-        max_deposit = max(max_deposit, deposit)
-        mdd = min(mdd, deposit/max_deposit-1)
+    if geometric:
+        max_deposit = 1.
+        deposit = 1.
+        mdd = 0.
+        for p in profits:
+            deposit *= (p*leverage+1)
+            max_deposit = max(max_deposit, deposit)
+            mdd = min(mdd, deposit/max_deposit-1)
+    else:
+        max_deposit = 0.
+        deposit = 0.
+        mdd = 0.
+        for p in profits:
+            deposit += p*leverage
+            max_deposit = max(max_deposit, deposit)
+            mdd = min(mdd, deposit-max_deposit)
+
     return mdd
+
+def getMaxTuw(profits, leverage=1., geometric=True):
+    max_tuw = 0
+    tuw = 0
+    if geometric:
+        max_deposit = 1.
+        deposit = 1.
+        for p in profits:
+            deposit *= (p*leverage+1)
+            if deposit >= max_deposit:
+                tuw = 0
+                max_deposit = deposit
+            else:
+                tuw += 1
+                max_tuw = max(tuw, max_tuw)
+    else:
+        max_deposit = 0.
+        deposit = 0.
+        for p in profits:
+            deposit += p*leverage
+            if deposit >= max_deposit:
+                tuw = 0
+                max_deposit = deposit
+            else:
+                tuw += 1
+                max_tuw = max(tuw, max_tuw)
+
+    return max_tuw
 
 def getSharpe(profits, ticks, trange, tunit):
     if len(ticks) <= 1:
