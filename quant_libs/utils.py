@@ -192,6 +192,31 @@ def trimDictChart(chart: dict, from_date, to_date):
                 del chart[k][ti]
     return chart
 
+def convResDictChart_30mto1h(chart_30m: dict, phase = 0):
+    chart = {"t":[], "o": [], "h": [], "l": [], "c": [], "v": []}
+    t = chart_30m["t"][0]
+    o = chart_30m["o"][0]
+    h = chart_30m["h"][0]
+    l = chart_30m["l"][0]
+    c = chart_30m["c"][0]
+    v = chart_30m["v"][0]
+    for ti in range(1, len(chart_30m["t"])):
+        if (phase==1 and chart_30m["t"][ti].minute==30) or (phase==0 and chart_30m["t"][ti].minute==0):
+            t = chart_30m["t"][ti]
+            o = chart_30m["o"][ti]
+            h = chart_30m["h"][ti]
+            l = chart_30m["l"][ti]
+            c = chart_30m["c"][ti]
+            v = chart_30m["v"][ti]
+        else:
+            chart["t"].append(t)
+            chart["o"].append(o)
+            chart["h"].append(max(chart_30m["h"][ti], h))
+            chart["l"].append(min(chart_30m["l"][ti], l))
+            chart["c"].append(chart_30m["c"][ti])
+            chart["v"].append(chart_30m["v"][ti] + v)
+    return chart
+
 def isKrHoliday(dt):
     holidays = ["241225","250101","250128","250129","250130","250303","250405","250505","250506","250606","250815","251003",
                 "251006","251007","251008","251009",]
@@ -229,6 +254,23 @@ def waitForHms(h, m, s, valid_hour=6):
         print(strNow()+"Waiting for %02d:%02d:%02d (%02d:%02d:%02d remain)  "%(h, m, s, remain_h, remain_m, remain_s),end="\r")
         if (h*60*60 + m*60 + s <= now.hour*60*60 + now.minute*60 + now.second < (h+valid_hour)*60*60 + m*60 + s) or \
             ((now.hour+24)*60*60 + now.minute*60 + now.second < (h+valid_hour)*60*60 + m*60 + s):
+            print("")
+            break
+        time.sleep(1)
+
+def waitSeconds(s):
+    wait_start = datetime.datetime.now()
+    wait_until = wait_start + datetime.timedelta(seconds=s)
+    h = wait_until.hour
+    m = wait_until.minute
+    s = wait_until.second
+    while True:
+        remain = (wait_until - datetime.datetime.now()).seconds
+        remain_h = remain//3600
+        remain_m = (remain%3600)//60
+        remain_s = (remain%60)
+        print(strNow()+"Waiting for %02d:%02d:%02d (%02d:%02d:%02d remain)  "%(h, m, s, remain_h, remain_m, remain_s),end="\r")
+        if datetime.datetime.now() > wait_until:
             print("")
             break
         time.sleep(1)
