@@ -338,18 +338,24 @@ class Binance():
             if type(raw)!=list:
                 print("if type(raw)!=list:")
                 print(raw)
+                if raw["code"]==-1121: raise
+                time.sleep(5)
                 continue
             if type(raw[0])!=list:
                 print("if type(raw[0])!=list:")
+                time.sleep(5)
                 continue
             if len(raw[0])==0:
                 print("if len(raw[0])==0:")
+                time.sleep(5)
                 continue
             if type(raw[0][0]) != int:
                 print("if type(raw[0][0]) != int:")
+                time.sleep(5)
                 continue
             if type(raw[0][1]) != str:
                 print("if type(raw[0][1]) != str:")
+                time.sleep(5)
                 continue
             break
         chart = {"t":[],"o":[],"h":[],"l":[],"c":[],"v":[]}
@@ -639,7 +645,7 @@ class Binance():
             if order_status["status"]=="FILLED":
                 break
             time.sleep(refresh_period)
-            result = self.OrderModify("BUY",symbol,order_id,quantity,0,priceMatch="QUEUE")
+            result = self.OrderModify("BUY",symbol,order_id,quantity,0,priceMatch="QUEUE",reduce_only=reduce_only)
         return order_status
     def SellChase(self,symbol,quantity,leverage=0,reduce_only=False,position="",refresh_period=1.):
         result = self.NewOrder("SELL",symbol,quantity,0,leverage=leverage,reduce_only=reduce_only,position=position,priceMatch="QUEUE")
@@ -651,7 +657,7 @@ class Binance():
             if order_status["status"]=="FILLED":
                 break
             time.sleep(refresh_period)
-            result = self.OrderModify("SELL",symbol,order_id,quantity,0,priceMatch="QUEUE")
+            result = self.OrderModify("SELL",symbol,order_id,quantity,0,priceMatch="QUEUE",reduce_only=reduce_only)
             #print("ordermodifu")
             #print(result)
         return order_status
@@ -697,11 +703,11 @@ class Binance():
             else:
                 self.std_log("NewOrder %s (quantity:%f, orderID:%d)"%(symbol, quantity, a["orderId"]))
         return a
-    def BuyModify(self, symbol, orderId, quantity, price, priceMatch="NONE"):
-        return self.OrderModify("BUY", symbol, orderId, quantity, price, priceMatch=priceMatch)
-    def SellModify(self, symbol, orderId, quantity, price, priceMatch="NONE"):
-        return self.OrderModify("SELL", symbol, orderId, quantity, price, priceMatch=priceMatch)
-    def OrderModify(self, side, symbol, orderId, quantity, price, priceMatch="NONE"):
+    def BuyModify(self, symbol, orderId, quantity, price, priceMatch="NONE", reduce_only=False):
+        return self.OrderModify("BUY", symbol, orderId, quantity, price, priceMatch=priceMatch, reduce_only=reduce_only)
+    def SellModify(self, symbol, orderId, quantity, price, priceMatch="NONE", reduce_only=False):
+        return self.OrderModify("SELL", symbol, orderId, quantity, price, priceMatch=priceMatch, reduce_only=reduce_only)
+    def OrderModify(self, side, symbol, orderId, quantity, price, priceMatch="NONE", reduce_only=False):
         if self.fake_trading:
             # TODO
             a = {"orderId": 0}
@@ -715,6 +721,8 @@ class Binance():
                 payload["priceMatch"] = priceMatch
             else:
                 payload["price"] = self.priceRound(symbol, price)
+            if reduce_only: # Only in future
+                payload["reduceOnly"]="true"
             a = self.send_signed_request("PUT", self.ep_prefix + "/order", payload=payload)
             if "code" in a:
                 if a["code"]==-5027 or a["code"]==-2013:
