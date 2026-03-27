@@ -330,3 +330,8 @@ def testDistribution(
     
     #plt.tight_layout()
     plt.show()
+
+def linearRegression1d(ys):
+    xs = np.arange(len(ys))
+    slope, intercept = np.polyfit(xs, ys, 1)
+    return float(slope), float(intercept)
