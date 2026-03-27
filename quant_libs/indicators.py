@@ -432,8 +432,19 @@ def getSharpe(profits, ticks, trange, tunit):
             ticks = ticks[1:]
         profits_by_t.append(profit)
         tick = tick+tunit
-    if len(profits_by_t)<=1: return 0
-    return sum(profits_by_t)/len(profits_by_t)/stdev(profits_by_t)
+    l = len(profits_by_t)
+    if l<=1: return 0
+    s = stdev(profits_by_t)
+    if s==0: return 0
+    return sum(profits_by_t)/len(profits_by_t)/s
+
+def getPeriodicProfit(profits, ticks, trange, dividend):
+    periodic_profits = [0] * dividend
+    period = (trange[1]-trange[0]+datetime.timedelta(seconds=1))/dividend
+    pi = 0
+    for profit, tick in zip(profits, ticks):
+        periodic_profits[(tick-trange[0])//period] += profit
+    return periodic_profits
 
 def getCProfit(profits, leverage=1., geometric=True):
     if geometric:
