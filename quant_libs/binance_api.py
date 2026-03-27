@@ -642,8 +642,11 @@ class Binance():
         while True:
             order_status = self.CheckOrder(symbol, order_id)
             #print(order_status)
-            if order_status["status"]=="FILLED":
-                break
+            try:
+                if order_status["status"]=="FILLED":
+                    break
+            except:
+                print(order_status)
             time.sleep(refresh_period)
             result = self.OrderModify("BUY",symbol,order_id,quantity,0,priceMatch="QUEUE",reduce_only=reduce_only)
         return order_status
@@ -654,8 +657,11 @@ class Binance():
         while True:
             order_status = self.CheckOrder(symbol, order_id)
             #print(order_status)
-            if order_status["status"]=="FILLED":
-                break
+            try:
+                if order_status["status"]=="FILLED":
+                    break
+            except:
+                print(order_status)
             time.sleep(refresh_period)
             result = self.OrderModify("SELL",symbol,order_id,quantity,0,priceMatch="QUEUE",reduce_only=reduce_only)
             #print("ordermodifu")
