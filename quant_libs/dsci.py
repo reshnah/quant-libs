@@ -4,6 +4,7 @@ from matplotlib import pyplot as plt
 from typing import List, Union
 import dill
 import os
+import bisect
 
 @singleton
 class DSciSetting:
@@ -20,6 +21,9 @@ class Kmeans:
         self.centroids = []
         self.distance_func = None
         self.feature_weight = []
+        self.distance_medians = []
+        self.distance_maxima = []
+        self.num_samples_by_label = []
         return
     
     def getLabelAndDist(self, data_input):
@@ -32,11 +36,25 @@ class Kmeans:
                 label = ci
         return label, nearest_distance
     
+    def getLabelAndConfidence(self, data_input):
+        label, dist = self.getLabelAndDist(data_input)
+        if dist < self.distance_medians[label]:
+            confidence = 1 - dist/self.distance_medians[label]*0.5
+        else:
+            confidence = 1 - dist/self.distance_maxima[label]
+        return label, confidence
+    
     def getLabel(self, data_input):
         label, dist = self.getLabelAndDist(data_input)
         return label
+    
+    def getClusterSize(self, label):
+        return self.num_samples_by_label[label]
 
     def kMeans(self, data_input, num_cluster, distance_func, iteration=10, wcss_en=False):
+        self.distance_medians = []
+        self.distance_maxima = []        
+        self.num_samples_by_label = [0]*num_cluster
         labels = []
 
         self.centroids = kMeansPp(data_input, num_cluster, distance_func)
@@ -44,6 +62,12 @@ class Kmeans:
         wcss = 0
         for _ in range(iteration):
             labels = []
+
+            if _==iteration-1:
+                distances_by_label = []
+                for i in range(num_cluster):
+                    distances_by_label.append([])
+            
             wcss = 0
             for di in range(len(data_input)):
                 nearest_centroid_id = -1
@@ -53,6 +77,8 @@ class Kmeans:
                     if nearest_distance > distance_from_centroid:
                         nearest_distance = distance_from_centroid
                         nearest_centroid_id = ci
+                if _==iteration-1:
+                    bisect.insort(distances_by_label[nearest_centroid_id], nearest_distance)
                 if wcss_en:
                     wcss += nearest_distance**2
                 labels.append(nearest_centroid_id)
@@ -68,12 +94,18 @@ class Kmeans:
                     sum_data = sum_data + np.array(d)
                     cluster_size += 1
                 self.centroids[ci] = list(sum_data / cluster_size)
+                self.num_samples_by_label[ci] = cluster_size
             if DSciSetting().debug:
                 if len(data_input[0]) == 2:
                     plt.scatter([d[0] for d in data_input], [d[1] for d in data_input], c=labels, cmap="viridis", alpha=0.5)
                     plt.scatter([c[0] for c in self.centroids],
                                 [c[1] for c in self.centroids], marker="x", c="red", s=200, linewidths=3)
                     plt.show()
+
+        for i in range(num_cluster):
+            self.distance_maxima.append(distances_by_label[i][-1])
+            self.distance_medians.append(distances_by_label[i][len(distances_by_label[i])//2])
+            
         if wcss_en:
             return labels[:], wcss
         else:
@@ -91,6 +123,133 @@ class Kmeans:
             self.distance_func = dill.load(fin)
         with open(directory + "/centroids.txt", "r") as fin:
             self.centroids = eval(fin.readline())
+
+class Kmedoids:
+    # TODO
+    def __init__(self):
+        self.centroids = []
+        self.distance_func = None
+        self.feature_weight = []
+        self.distance_medians = []
+        self.distance_maxima = []
+        self.num_samples_by_label = []
+        return
+    
+    def getLabelAndDist(self, data_input):
+        nearest_distance = float("inf")
+        label = -1
+        for ci, centroid in enumerate(self.centroids):
+            dist = self.distance_func(data_input, centroid)
+            if nearest_distance > dist:
+                nearest_distance = dist
+                label = ci
+        return label, nearest_distance
+    
+    def getLabelAndConfidence(self, data_input):
+        label, dist = self.getLabelAndDist(data_input)
+        if self.distance_maxima[label]==0: return label, 0
+        if dist < self.distance_medians[label]:
+            confidence = 1 - dist/self.distance_medians[label]*0.5
+        else:
+            confidence = 1 - dist/self.distance_maxima[label]
+        return label, confidence
+    
+    def getLabel(self, data_input):
+        label, dist = self.getLabelAndDist(data_input)
+        return label
+    
+    def getClusterSize(self, label):
+        return self.num_samples_by_label[label]
+
+    def kMedoids(self, data_input, num_cluster, distance_func, iteration=10, wcss_en=False):
+        self.distance_medians = []
+        self.distance_maxima = []        
+        self.num_samples_by_label = [0]*num_cluster
+        labels = []
+
+        self.centroids = kMeansPp(data_input, num_cluster, distance_func)
+        self.distance_func = distance_func
+        wcss = 0
+        for _ in range(iteration):
+            labels = [0] * len(data_input)
+            clusters = [[] for __ in range(num_cluster)]
+
+            if _==iteration-1:
+                distances_by_label = []
+                for i in range(num_cluster):
+                    distances_by_label.append([])
+            
+            # Assignment Step
+            for di in range(len(data_input)):
+                label, dist = self.getLabelAndDist(data_input[di])
+                labels[di] = label
+                clusters[label].append(di)
+
+            
+            # Update Step: Find the new medoid for each cluster
+            for ci in range(num_cluster):
+                cluster_indices = clusters[ci]
+                if not cluster_indices: continue
+                
+                # For each point in the cluster, calculate sum of distances to all other points
+                best_cost = float("inf")
+                best_medoid = self.centroids[ci]
+                
+                for candidate_idx in cluster_indices:
+                    candidate_point = data_input[candidate_idx]
+                    current_cost = 0
+                    for other_idx in cluster_indices:
+                        current_cost += distance_func(candidate_point, data_input[other_idx])
+                    
+                    if current_cost < best_cost:
+                        best_cost = current_cost
+                        best_medoid = candidate_point
+                
+                self.centroids[ci] = best_medoid
+                self.num_samples_by_label[ci] = len(cluster_indices)
+
+            if DSciSetting().debug:
+                if len(data_input[0]) == 2:
+                    plt.scatter([d[0] for d in data_input], [d[1] for d in data_input], c=labels, cmap="viridis", alpha=0.5)
+                    plt.scatter([c[0] for c in self.centroids],
+                                [c[1] for c in self.centroids], marker="x", c="red", s=200, linewidths=3)
+                    plt.show()
+        
+        # Post-processing: Calculate medians and maxima for confidence
+        distances_by_label = [[] for _ in range(num_cluster)]
+        for di in range(len(data_input)):
+            label, dist = self.getLabelAndDist(data_input[di])
+            bisect.insort(distances_by_label[label], dist)
+
+        for i in range(num_cluster):
+            self.distance_maxima.append(distances_by_label[i][-1])
+            self.distance_medians.append(distances_by_label[i][len(distances_by_label[i])//2])
+            
+        return labels[:]
+    
+    def exportKMedoids(self, directory):
+        if not os.path.isdir(directory):
+            os.makedirs(directory)
+        with open(directory + "/dist_func.pkl", "wb") as fout:
+            dill.dump(self.distance_func, fout)
+        with open(directory + "/centroids.txt", "w") as fout:
+            fout.writelines(str(self.centroids))
+    def importKMedoids(self, directory):
+        with open(directory + "/dist_func.pkl", "rb") as fin:
+            self.distance_func = dill.load(fin)
+        with open(directory + "/centroids.txt", "r") as fin:
+            self.centroids = eval(fin.readline())
+
+class KMedians:
+    def __init__(self):
+        self.centroids = []
+        self.distance_func = None
+        self.feature_weight = []
+        self.distance_medians = []
+        self.distance_maxima = []
+        self.num_samples_by_label = []
+        return
+    # TODO
 
 def kMeansPp(data_input, num_cluster, distance_func):
     import random
