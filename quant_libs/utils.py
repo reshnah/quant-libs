@@ -1,5 +1,5 @@
 from math import exp
-from math import log
+from math import log2
 import datetime
 from quant_libs.logger import *
 
@@ -95,10 +95,10 @@ def softThreshold(x, a):
 def entropy(a, b=None):
     if b is None:
         if a==0 or a==1: return 0
-        return -a*log(a)
+        return -a*log2(a)*2
     else:
         if a==0 or b==0: return 0
-        return -(a/b)*log(a/b)
+        return -(a/(a+b))*log2(a/(a+b))*2
 
 def transpose(l_2d):
     n_row = len(l_2d)
