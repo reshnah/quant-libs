@@ -441,10 +441,32 @@ def getSharpe(profits, ticks, trange, tunit):
 def getPeriodicProfit(profits, ticks, trange, dividend):
     periodic_profits = [0] * dividend
     period = (trange[1]-trange[0]+datetime.timedelta(seconds=1))/dividend
-    pi = 0
     for profit, tick in zip(profits, ticks):
         periodic_profits[(tick-trange[0])//period] += profit
     return periodic_profits
+
+def getPeriodicNumSum(profits, ticks, trange, dividend):
+    periodic_profits = [0] * dividend
+    nums = [0] * dividend
+    period = (trange[1]-trange[0]+datetime.timedelta(seconds=1))/dividend
+    for profit, tick in zip(profits, ticks):
+        periodic_profits[(tick-trange[0])//period] += profit
+        nums[(tick-trange[0])//period] += 1
+    return periodic_profits, nums
+
+def getPeriodicBNB(profits, ticks, trange, dividend):
+    bulls = [0] * dividend
+    bears = [0] * dividend
+    neuts = [0] * dividend
+    period = (trange[1]-trange[0]+datetime.timedelta(seconds=1))/dividend
+    for profit, tick in zip(profits, ticks):
+        if profit > 0:
+            bulls[(tick-trange[0])//period] += 1
+        elif profit < 0:
+            bears[(tick-trange[0])//period] += 1
+        else:
+            neuts[(tick-trange[0])//period] += 0
+    return bulls, neuts, bears
 
 def getCProfit(profits, leverage=1., geometric=True):
     if geometric:
