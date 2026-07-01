@@ -52,7 +52,6 @@ def getChart(ticker,from_date,to_date=None):
     for trial in range(5):
         try:
             df = fdr.DataReader(ticker, from_date, to_date)
-    
             chart = {}
             chart["t"] = list(df.index)
             chart["o"] = list(df["Open"])
@@ -60,6 +59,8 @@ def getChart(ticker,from_date,to_date=None):
             chart["l"] = list(df["Low"])
             chart["c"] = list(df["Close"])
             chart["v"] = list(df["Volume"])
+            if "Adj Close" in df:
+                chart["ac"] = list(df["Adj Close"])
             return chart
         except (requests.exceptions.HTTPError,
                 ConnectionError,
@@ -92,17 +93,28 @@ def exportCharts(dst_dir, tickers, from_date,to_date=None,mute=False,prefix="",r
         c = getChart(ticker, from_date, to_date)
         if c is None: continue
         fout = open(dst_dir + prefix + ticker + ".csv", "w")
-        fout.writelines("Date,Price,Open,High,Low,Volume\n")
+        fout.writelines("Date,Price,Open,High,Low,Volume")
+        if "ac" in c:
+            ac = c["ac"]
+            fout.writelines(",AdjClose")
+        fout.writelines("\n")
         p = c["c"]
         o = c["o"]
         h = c["h"]
         l = c["l"]
         v = c["v"]
         t = c["t"]
-        for ti in range(len(p)):
-            fout.writelines("\"%04d-%02d-%02d\",\"%f\",\"%f\",\"%f\",\"%f\",\"%f\"\n" % (
-                t[ti].year, t[ti].month, t[ti].day,
-                p[ti], o[ti], h[ti], l[ti], v[ti]))
+        
+        if "ac" in c:
+            for ti in range(len(p)):
+                fout.writelines("\"%04d-%02d-%02d\",\"%f\",\"%f\",\"%f\",\"%f\",\"%f\",\"%f\"\n" % (
+                    t[ti].year, t[ti].month, t[ti].day,
+                    p[ti], o[ti], h[ti], l[ti], v[ti], ac[ti]))
+        else:
+            for ti in range(len(p)):
+                fout.writelines("\"%04d-%02d-%02d\",\"%f\",\"%f\",\"%f\",\"%f\",\"%f\"\n" % (
+                    t[ti].year, t[ti].month, t[ti].day,
+                    p[ti], o[ti], h[ti], l[ti], v[ti]))
         fout.close()
     if not mute:
         print("")
