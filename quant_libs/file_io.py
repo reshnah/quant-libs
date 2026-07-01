@@ -21,7 +21,8 @@ chart_tag_map = {"time": "t",
                  "price": "c", "close": "c",
                  "low": "l",
                  "high": "h",
-                 "volume": "v"}
+                 "volume": "v",
+                 "adjclose": "ac"}
 
 class open_wait:
     def __init__(self, filename, mode):
@@ -72,7 +73,7 @@ class open_wait:
         return False # Ensure exceptions are propagated by default
 
 def importCsvChartDict(csv_path):
-    chart = {"t": [], "o": [], "h": [], "l": [], "c": [], "v": []}
+    chart = {"t": [], "o": [], "h": [], "l": [], "c": [], "v": [], "ac": []}
     with open(csv_path, newline='') as f:
         reader = csv.reader(f, delimiter=',')        
         first_row = next(reader)
