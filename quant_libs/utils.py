@@ -283,3 +283,18 @@ def waitSeconds(s):
             print("")
             break
         time.sleep(1)
+
+def addElementSorted(score_add, sync_add, score_list, sync_list_0, descending=True):
+    if descending:
+        score_sign = 1
+    else:
+        score_sign = -1
+    for si in range(len(score_list)):
+        if score_add*score_sign < score_list[si]*score_sign:
+            score_list = score_list[:si] + [score_add] + score_list[si:]
+            sync_list_0 = sync_list_0[:si] + [sync_add] + sync_list_0[si:]
+            break
+    else:
+        score_list.append(score_add)
+        sync_list_0.append(sync_add)
+    return score_list, sync_list_0
