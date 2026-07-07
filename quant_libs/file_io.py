@@ -129,15 +129,20 @@ def importReversedCsvChartDict(csv_path):
 def exportCsvChart(chart, csv_path):
     if type(chart)==dict:
         with open(csv_path, "w") as fout:
+            fout.writelines("Datetime,Open,High,Low,Price")
             if "v" in chart:
-                fout.writelines("Datetime,Open,High,Low,Price,Volume\n")
-                for ti in range(len(chart["t"])):
-                    fout.writelines(f'{chart["t"][ti].strftime("%Y-%m-%d %H:%M:%S")},'
-                                    f'{chart["o"][ti]},{chart["h"][ti]},{chart["l"][ti]},{chart["c"][ti]},{chart["v"][ti]}\n')
-            else:
-                fout.writelines("Datetime,Open,High,Low,Price\n")
-                for ti in range(len(chart["t"])):
-                    fout.writelines(f'{chart["t"][ti].strftime("%Y-%m-%d %H:%M:%S")},{chart["o"][ti]},{chart["h"][ti]},{chart["l"][ti]},{chart["c"][ti]}\n')
+                fout.writelines(",Volume")
+            if "ac" in chart:
+                fout.writelines(",AdjClose")
+            fout.writelines("\n")
+
+            for ti in range(len(chart["t"])):
+                fout.writelines(f'{chart["t"][ti].strftime("%Y-%m-%d %H:%M:%S")},{chart["o"][ti]},{chart["h"][ti]},{chart["l"][ti]},{chart["c"][ti]}')
+                if "v" in chart:
+                    fout.writelines(f',{chart["v"][ti]}')
+                if "ac" in chart:
+                    fout.writelines(f',{chart["ac"][ti]}')
+                fout.writelines(f'\n')
 
 def getFileUpdateDatetime(fname):
     path = Path(fname)
