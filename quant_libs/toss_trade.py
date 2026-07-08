@@ -1,7 +1,11 @@
 import os
+import sys
 import time
+import logging
 import datetime
+import warnings
 import requests
+
 
 class TossAPIError(Exception):
     """
@@ -59,6 +63,17 @@ class TossTrade:
     Trading system client for Toss Invest Open API.
     """
     def __init__(self, account_seq=None):
+        # --- Logger setup (default: WARNING so it's quiet unless opted-in) ---
+        self._logger = logging.getLogger(__name__)
+        if not self._logger.handlers:
+            _handler = logging.StreamHandler(sys.stdout)
+            _handler.setFormatter(logging.Formatter(
+                "[%(asctime)s] %(levelname)s [TossTrade] %(message)s",
+                datefmt="%Y-%m-%d %H:%M:%S"
+            ))
+            self._logger.addHandler(_handler)
+        self._logger.setLevel(logging.INFO)
+
         # Read keys from environment variables
         self.api_key = os.environ.get("TOSS_API_KEY")
         self.secret_key = os.environ.get("TOSS_SECRET_KEY")
@@ -80,7 +95,40 @@ class TossTrade:
 
         # If account_seq is not provided, fetch the default brokerage account
         if self.account_seq is None:
+            self._logger.debug("account_seq not provided; resolving default account.")
             self.resolve_default_account()
+
+        self._logger.info("TossTrade initialised (account_seq=%s).", self.account_seq)
+
+    # ------------------------------------------------------------------
+    # Logging control
+    # ------------------------------------------------------------------
+
+    def setLogLevel(self, level):
+        """
+        Sets the logging verbosity for this TossTrade instance.
+
+        Args:
+            level: A logging level constant or string name.
+                   e.g. logging.DEBUG, logging.INFO, "DEBUG", "INFO",
+                        "WARNING", "ERROR", "CRITICAL".
+
+        Examples:
+            trade.setLogLevel(logging.DEBUG)   # most verbose
+            trade.setLogLevel("INFO")
+            trade.setLogLevel(logging.WARNING)  # default — quiet
+        """
+        if isinstance(level, str):
+            numeric = getattr(logging, level.upper(), None)
+            if numeric is None:
+                raise ValueError(f"Unknown log level: {level!r}")
+            level = numeric
+        self._logger.setLevel(level)
+        self._logger.info("Log level set to %s.", logging.getLevelName(level))
+
+    # ------------------------------------------------------------------
+    # Internal helpers
+    # ------------------------------------------------------------------
 
     def _get_token(self):
         """
@@ -90,8 +138,10 @@ class TossTrade:
         now = time.time()
         # If token is still valid (with 60 seconds buffer), reuse it
         if self._access_token and now < self._token_expiry - 60:
+            self._logger.debug("Reusing cached OAuth2 token (expires in %.0fs).", self._token_expiry - now)
             return self._access_token
 
+        self._logger.debug("Fetching new OAuth2 access token.")
         url = f"{self.base_url}/oauth2/token"
         headers = {
             "Content-Type": "application/x-www-form-urlencoded",
@@ -105,11 +155,13 @@ class TossTrade:
 
         response = self.session.post(url, headers=headers, data=data)
         if response.status_code != 200:
+            self._logger.error("OAuth2 token request failed (HTTP %s).", response.status_code)
             raise TossAPIError.from_response(response)
 
         res_json = response.json()
         self._access_token = res_json["access_token"]
         self._token_expiry = now + int(res_json["expires_in"])
+        self._logger.debug("OAuth2 token obtained; expires in %ss.", res_json["expires_in"])
         return self._access_token
 
     def _get_headers(self):
@@ -131,32 +183,51 @@ class TossTrade:
         if headers:
             req_headers.update(headers)
 
+        self._logger.debug("%s %s  params=%s  body=%s", method, path, params, json)
         response = self.session.request(method, url, headers=req_headers, params=params, json=json)
+        self._logger.debug("Response HTTP %s from %s.", response.status_code, path)
 
         if not (200 <= response.status_code < 300):
+            self._logger.error(
+                "API error on %s %s — HTTP %s: %s",
+                method, path, response.status_code, response.text[:200]
+            )
             raise TossAPIError.from_response(response)
 
         return response.json()
+
+    # ------------------------------------------------------------------
+    # Account helpers
+    # ------------------------------------------------------------------
 
     def resolve_default_account(self):
         """
         Fetches the user's accounts list and selects the first active brokerage account
         to use as the default account sequence.
         """
+        self._logger.debug("Resolving default account.")
         accounts = self.getAccounts()
         if not accounts:
             raise ValueError("No Toss brokerage accounts found for this user context.")
         self.account_seq = accounts[0]["accountSeq"]
+        self._logger.info("Default account resolved: account_seq=%s.", self.account_seq)
 
     def getAccounts(self):
         """
         Retrieves the list of accounts associated with the user.
-        
+
         Returns:
             list: List of accounts containing accountNo, accountSeq, accountType.
         """
+        self._logger.debug("getAccounts() called.")
         response = self._request("GET", "/api/v1/accounts")
-        return response.get("result", [])
+        accounts = response.get("result", [])
+        self._logger.info("getAccounts() returned %d account(s).", len(accounts))
+        return accounts
+
+    # ------------------------------------------------------------------
+    # Order management
+    # ------------------------------------------------------------------
 
     def buy(self, ticker, quantity, price):
         """
@@ -172,6 +243,9 @@ class TossTrade:
             str: The generated order ID.
         """
         order_type = "MARKET" if price == 0 else "LIMIT"
+        self._logger.info(
+            "buy() %s  qty=%s  price=%s  type=%s", ticker, quantity, price, order_type
+        )
         payload = {
             "symbol": ticker,
             "side": "BUY",
@@ -186,7 +260,9 @@ class TossTrade:
             "Content-Type": "application/json"
         }
         response = self._request("POST", "/api/v1/orders", headers=headers, json=payload)
-        return response["result"]["orderId"]
+        order_id = response["result"]["orderId"]
+        self._logger.info("buy() order placed: orderId=%s.", order_id)
+        return order_id
 
     def sell(self, ticker, quantity, price):
         """
@@ -202,6 +278,9 @@ class TossTrade:
             str: The generated order ID.
         """
         order_type = "MARKET" if price == 0 else "LIMIT"
+        self._logger.info(
+            "sell() %s  qty=%s  price=%s  type=%s", ticker, quantity, price, order_type
+        )
         payload = {
             "symbol": ticker,
             "side": "SELL",
@@ -216,7 +295,9 @@ class TossTrade:
             "Content-Type": "application/json"
         }
         response = self._request("POST", "/api/v1/orders", headers=headers, json=payload)
-        return response["result"]["orderId"]
+        order_id = response["result"]["orderId"]
+        self._logger.info("sell() order placed: orderId=%s.", order_id)
+        return order_id
 
     def modifyOrder(self, order_id, quantity=None, price=None, order_type=None):
         """
@@ -231,6 +312,10 @@ class TossTrade:
         Returns:
             str: The new generated order ID.
         """
+        self._logger.info(
+            "modifyOrder() orderId=%s  qty=%s  price=%s  type=%s",
+            order_id, quantity, price, order_type
+        )
         payload = {}
         if order_type is not None:
             payload["orderType"] = order_type
@@ -249,7 +334,9 @@ class TossTrade:
         }
         path = f"/api/v1/orders/{order_id}/modify"
         response = self._request("POST", path, headers=headers, json=payload)
-        return response["result"]["orderId"]
+        new_order_id = response["result"]["orderId"]
+        self._logger.info("modifyOrder() new orderId=%s.", new_order_id)
+        return new_order_id
 
     def cancelOrder(self, order_id):
         """
@@ -261,13 +348,16 @@ class TossTrade:
         Returns:
             str: The order ID of the cancelled order.
         """
+        self._logger.info("cancelOrder() orderId=%s.", order_id)
         headers = {
             "X-Tossinvest-Account": str(self.account_seq),
             "Content-Type": "application/json"
         }
         path = f"/api/v1/orders/{order_id}/cancel"
         response = self._request("POST", path, headers=headers, json={})
-        return response["result"]["orderId"]
+        cancelled_id = response["result"]["orderId"]
+        self._logger.info("cancelOrder() cancelled orderId=%s.", cancelled_id)
+        return cancelled_id
 
     def getOrder(self, order_id):
         """
@@ -279,12 +369,15 @@ class TossTrade:
         Returns:
             dict: The detailed order information.
         """
+        self._logger.debug("getOrder() orderId=%s.", order_id)
         headers = {
             "X-Tossinvest-Account": str(self.account_seq)
         }
         path = f"/api/v1/orders/{order_id}"
         response = self._request("GET", path, headers=headers)
-        return response.get("result", {})
+        result = response.get("result", {})
+        self._logger.debug("getOrder() status=%s.", result.get("status"))
+        return result
 
     def getOrders(self, status=None, symbol=None, from_date=None, to_date=None, cursor=None, limit=20):
         """
@@ -301,6 +394,10 @@ class TossTrade:
         Returns:
             dict: Dictionary with 'orders' list, 'nextCursor' string, and 'hasNext' boolean.
         """
+        self._logger.debug(
+            "getOrders() status=%s  symbol=%s  from=%s  to=%s  limit=%s",
+            status, symbol, from_date, to_date, limit
+        )
         headers = {
             "X-Tossinvest-Account": str(self.account_seq)
         }
@@ -319,31 +416,45 @@ class TossTrade:
             params["limit"] = limit
 
         response = self._request("GET", "/api/v1/orders", headers=headers, params=params)
-        return response.get("result", {})
+        result = response.get("result", {})
+        self._logger.debug(
+            "getOrders() returned %d order(s)  hasNext=%s.",
+            len(result.get("orders", [])), result.get("hasNext")
+        )
+        return result
+
+    # ------------------------------------------------------------------
+    # Market data
+    # ------------------------------------------------------------------
 
     def getPrice(self, ticker):
         """
         Fetches the mid-price between the nearest bid and nearest ask.
         """
+        self._logger.debug("getPrice() %s.", ticker)
         book = self.getBook(ticker)
         if not book["bids_p"] or not book["asks_p"]:
             raise ValueError(f"Cannot calculate mid-price; orderbook for {ticker} is empty.")
-        return (book["bids_p"][0] + book["asks_p"][0]) / 2.0
+        mid = (book["bids_p"][0] + book["asks_p"][0]) / 2.0
+        self._logger.debug("getPrice() %s -> %.6g.", ticker, mid)
+        return mid
 
     def getBook(self, ticker):
         """
         Retrieves the orderbook for a stock.
-        
+
         Args:
             ticker (str): Stock ticker.
 
         Returns:
             dict: Dict of bids/asks prices and quantities, sorted by nearest to farthest.
         """
+        self._logger.debug("getBook() %s.", ticker)
         response = self._request("GET", "/api/v1/orderbook", params={"symbol": ticker})
         result = response.get("result", {})
         bids = result.get("bids", [])
         asks = result.get("asks", [])
+        self._logger.debug("getBook() %s  bids=%d  asks=%d.", ticker, len(bids), len(asks))
 
         # In Toss API:
         # bids is sorted highest price to lowest price (highest is nearest)
@@ -368,6 +479,10 @@ class TossTrade:
         Returns:
             dict: OHLCVT lists sorted in ascending order of time.
         """
+        self._logger.debug(
+            "getChart() %s  tf=%s  to_date=%s  adjusted=%s.",
+            ticker, timeframe, to_date, adjusted
+        )
         params = {
             "symbol": ticker,
             "interval": timeframe,
@@ -401,6 +516,9 @@ class TossTrade:
 
         # Ensure sorting in ascending order of time
         parsed_candles.sort(key=lambda x: x["t"])
+        self._logger.debug(
+            "getChart() %s  tf=%s  -> %d candles.", ticker, timeframe, len(parsed_candles)
+        )
 
         return {
             "o": [x["o"] for x in parsed_candles],
@@ -435,12 +553,18 @@ class TossTrade:
             Warning: Printed if the API history is exhausted before reaching from_date
                      (i.e., the returned chart starts later than from_date).
         """
+        self._logger.debug(
+            "getLongChart() %s  tf=%s  from_date=%s  adjusted=%s.",
+            ticker, timeframe, from_date, adjusted
+        )
         all_candles = []   # list of per-candle dicts: {"t", "o", "h", "l", "c", "v"}
         to_date = None     # None means "up to now" for the first call
+        batch_count = 0
 
         while True:
             batch = self.getChart(ticker, timeframe, to_date=to_date, adjusted=adjusted)
             time.sleep(0.2)
+            batch_count += 1
 
             if not batch["t"]:
                 if not all_candles:
@@ -448,7 +572,11 @@ class TossTrade:
                         f"getChart() returned no data for {ticker} ({timeframe})."
                     )
                 # API has no more history; stop here and warn the caller
-                import warnings
+                self._logger.warning(
+                    "getLongChart() API history exhausted after %d batch(es). "
+                    "Earliest candle is %s (requested from_date=%s).",
+                    batch_count, all_candles[0]["t"], from_date
+                )
                 warnings.warn(
                     f"API history exhausted before reaching from_date={from_date}. "
                     f"Earliest available candle is {all_candles[0]['t']}.",
@@ -475,7 +603,11 @@ class TossTrade:
 
             if not batch_candles:
                 # No new candles were fetched; API returned the same range — stop
-                import warnings
+                self._logger.warning(
+                    "getLongChart() no new candles in batch %d — stopping. "
+                    "Earliest candle is %s.",
+                    batch_count, all_candles[0]["t"]
+                )
                 warnings.warn(
                     f"API returned no earlier data. "
                     f"Earliest available candle is {all_candles[0]['t']}.",
@@ -485,9 +617,16 @@ class TossTrade:
 
             # Prepend batch (it goes further back in time)
             all_candles = batch_candles + all_candles
+            self._logger.debug(
+                "getLongChart() batch %d: prepended %d candles (oldest=%s, total=%d).",
+                batch_count, len(batch_candles), all_candles[0]["t"], len(all_candles)
+            )
 
             # Stop if we have reached from_date
             if all_candles[0]["t"] <= from_date:
+                self._logger.debug(
+                    "getLongChart() reached from_date after %d batch(es).", batch_count
+                )
                 break
 
             # Next fetch should end just before the earliest candle we have so far
@@ -495,6 +634,10 @@ class TossTrade:
 
         # Filter to only include candles at or after from_date
         all_candles = [c for c in all_candles if c["t"] >= from_date]
+        self._logger.debug(
+            "getLongChart() %s  tf=%s  -> %d total candles over %d batch(es).",
+            ticker, timeframe, len(all_candles), batch_count
+        )
 
         return {
             "o": [c["o"] for c in all_candles],
@@ -504,6 +647,10 @@ class TossTrade:
             "v": [c["v"] for c in all_candles],
             "t": [c["t"] for c in all_candles],
         }
+
+    # ------------------------------------------------------------------
+    # Account / deposit queries
+    # ------------------------------------------------------------------
 
     def getHoldings(self):
         """
@@ -517,6 +664,7 @@ class TossTrade:
                   - quantity: number of shares held.
                   - price: current last price in the stock's native currency.
         """
+        self._logger.debug("getHoldings() called.")
         headers = {"X-Tossinvest-Account": str(self.account_seq)}
         response = self._request("GET", "/api/v1/holdings", headers=headers)
         items = response.get("result", {}).get("items", [])
@@ -532,6 +680,7 @@ class TossTrade:
                 "quantity": float(item["quantity"]),
                 "price": float(item["lastPrice"]),
             }
+        self._logger.debug("getHoldings() returned %d position(s).", len(result))
         return result
 
     def getKrwDeposit(self):
@@ -541,13 +690,16 @@ class TossTrade:
         Returns:
             float: KRW amount available for purchase (integer value, won units).
         """
+        self._logger.debug("getKrwDeposit() called.")
         headers = {"X-Tossinvest-Account": str(self.account_seq)}
         response = self._request(
             "GET", "/api/v1/buying-power",
             headers=headers,
             params={"currency": "KRW"}
         )
-        return float(response.get("result", {}).get("cashBuyingPower", 0))
+        amount = float(response.get("result", {}).get("cashBuyingPower", 0))
+        self._logger.debug("getKrwDeposit() -> %.0f KRW.", amount)
+        return amount
 
     def getUsdDeposit(self):
         """
@@ -556,54 +708,83 @@ class TossTrade:
         Returns:
             float: USD amount available for purchase (decimal, dollar units).
         """
+        self._logger.debug("getUsdDeposit() called.")
         headers = {"X-Tossinvest-Account": str(self.account_seq)}
         response = self._request(
             "GET", "/api/v1/buying-power",
             headers=headers,
             params={"currency": "USD"}
         )
-        return float(response.get("result", {}).get("cashBuyingPower", 0))
+        amount = float(response.get("result", {}).get("cashBuyingPower", 0))
+        self._logger.debug("getUsdDeposit() -> %.4f USD.", amount)
+        return amount
+
+    # ------------------------------------------------------------------
+    # Chasing orders
+    # ------------------------------------------------------------------
 
     def buyChase(self, ticker, quantity, refresh_period=3.):
         """
         Places a buy order at current bid price and periodically adjusts it if the bid price rises.
         """
-        # Initial order at current bid price
+        self._logger.info(
+            "buyChase() %s  qty=%s  refresh=%.1fs.", ticker, quantity, refresh_period
+        )
         book = self.getBook(ticker)
         if not book["bids_p"]:
             raise ValueError(f"No bid price available for {ticker}")
         price = book["bids_p"][0]  # nearest bid price
         order_id = self.buy(ticker, quantity, price)
+        self._logger.info("buyChase() initial order placed at %s (orderId=%s).", price, order_id)
 
         while True:
             time.sleep(refresh_period)
             book = self.getBook(ticker)
             if not book["bids_p"]:
+                self._logger.warning("buyChase() empty orderbook for %s; skipping refresh.", ticker)
                 continue
             new_price = book["bids_p"][0]
             if new_price > price:
-                # modify order with new higher bid price
-                self.modifyOrder(order_id, price=new_price)
+                self._logger.info(
+                    "buyChase() bid rose %s -> %s; modifying orderId=%s.",
+                    price, new_price, order_id
+                )
+                order_id = self.modifyOrder(order_id, price=new_price)
                 price = new_price
+            else:
+                self._logger.debug(
+                    "buyChase() bid unchanged at %s; waiting.", price
+                )
 
     def sellChase(self, ticker, quantity, refresh_period=3.):
         """
         Places a sell order at current ask price and periodically adjusts it if the ask price falls.
         """
-        # Initial order at current ask price
+        self._logger.info(
+            "sellChase() %s  qty=%s  refresh=%.1fs.", ticker, quantity, refresh_period
+        )
         book = self.getBook(ticker)
         if not book["asks_p"]:
             raise ValueError(f"No ask price available for {ticker}")
         price = book["asks_p"][0]  # nearest ask price
         order_id = self.sell(ticker, quantity, price)
+        self._logger.info("sellChase() initial order placed at %s (orderId=%s).", price, order_id)
 
         while True:
             time.sleep(refresh_period)
             book = self.getBook(ticker)
             if not book["asks_p"]:
+                self._logger.warning("sellChase() empty orderbook for %s; skipping refresh.", ticker)
                 continue
             new_price = book["asks_p"][0]
             if new_price < price:
-                # modify order with new lower ask price
-                self.modifyOrder(order_id, price=new_price)
+                self._logger.info(
+                    "sellChase() ask fell %s -> %s; modifying orderId=%s.",
+                    price, new_price, order_id
+                )
+                order_id = self.modifyOrder(order_id, price=new_price)
                 price = new_price
+            else:
+                self._logger.debug(
+                    "sellChase() ask unchanged at %s; waiting.", price
+                )
