@@ -189,7 +189,7 @@ class TossTrade:
 
         if not (200 <= response.status_code < 300):
             self._logger.error(
-                "API error on %s %s — HTTP %s: %s",
+                "API error on %s %s - HTTP %s: %s",
                 method, path, response.status_code, response.text[:200]
             )
             raise TossAPIError.from_response(response)
@@ -316,6 +316,21 @@ class TossTrade:
             "modifyOrder() orderId=%s  qty=%s  price=%s  type=%s",
             order_id, quantity, price, order_type
         )
+        
+        # Retrieve the original order info
+        order_info = self.getOrder(order_id)
+        ticker = order_info.get("symbol", "")
+        
+        # Check if KR stock (six-digit number)
+        is_kr = ticker is not None and ticker.isdigit() and len(ticker) == 6
+        
+        if is_kr and quantity is None:
+            total_qty = float(order_info.get("quantity") or 0)
+            execution = order_info.get("execution") or {}
+            filled_qty = float(execution.get("filledQuantity") or 0)
+            quantity = total_qty - filled_qty
+            self._logger.info("modifyOrder() KR stock detected. Filled quantity with unfilled amount: %s", quantity)
+
         payload = {}
         if order_type is not None:
             payload["orderType"] = order_type
@@ -737,7 +752,26 @@ class TossTrade:
         order_id = self.buy(ticker, quantity, price)
         self._logger.info("buyChase() initial order placed at %s (orderId=%s).", price, order_id)
 
+        filled_price = 0
         while True:
+            order_result = self.getOrder(order_id)
+            status = order_result.get("status")
+            execution = order_result.get("execution") or {}
+            filled_qty = float(execution.get("filledQuantity") or 0)
+            avg_price = float(execution.get("averageFilledPrice") or 0)
+
+            self._logger.debug("buyChase() checking status=%s, filled_qty=%s", status, filled_qty)
+            
+            if status == "FILLED" or filled_qty >= quantity:
+                filled_price = avg_price
+                self._logger.info("buyChase() order fully executed at price %s.", filled_price)
+                break
+
+            if status in ("CANCELLED", "REJECTED"):
+                filled_price = avg_price
+                self._logger.warning("buyChase() order was %s. Executed price: %s", status, filled_price)
+                break
+
             time.sleep(refresh_period)
             book = self.getBook(ticker)
             if not book["bids_p"]:
@@ -755,6 +789,7 @@ class TossTrade:
                 self._logger.debug(
                     "buyChase() bid unchanged at %s; waiting.", price
                 )
+        return filled_price
 
     def sellChase(self, ticker, quantity, refresh_period=3.):
         """
@@ -770,7 +805,26 @@ class TossTrade:
         order_id = self.sell(ticker, quantity, price)
         self._logger.info("sellChase() initial order placed at %s (orderId=%s).", price, order_id)
 
+        filled_price = 0
         while True:
+            order_result = self.getOrder(order_id)
+            status = order_result.get("status")
+            execution = order_result.get("execution") or {}
+            filled_qty = float(execution.get("filledQuantity") or 0)
+            avg_price = float(execution.get("averageFilledPrice") or 0)
+
+            self._logger.debug("sellChase() checking status=%s, filled_qty=%s", status, filled_qty)
+
+            if status == "FILLED" or filled_qty >= quantity:
+                filled_price = avg_price
+                self._logger.info("sellChase() order fully executed at price %s.", filled_price)
+                break
+
+            if status in ("CANCELLED", "REJECTED"):
+                filled_price = avg_price
+                self._logger.warning("sellChase() order was %s. Executed price: %s", status, filled_price)
+                break
+
             time.sleep(refresh_period)
             book = self.getBook(ticker)
             if not book["asks_p"]:
@@ -788,3 +842,4 @@ class TossTrade:
                 self._logger.debug(
                     "sellChase() ask unchanged at %s; waiting.", price
                 )
+        return filled_price

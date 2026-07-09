@@ -182,6 +182,7 @@ class TestTossTrade(unittest.TestCase):
 
     @patch("requests.Session.request")
     def test_modify_order(self, mock_request):
+        # 1. Test US stock (symbol: AAPL)
         mock_resp_token = MagicMock()
         mock_resp_token.status_code = 200
         mock_resp_token.json.return_value = self.token_response
@@ -192,10 +193,21 @@ class TestTossTrade(unittest.TestCase):
 
         client = TossTrade()
 
+        # Mock responses: getOrder (symbol AAPL) -> modifyOrder
+        mock_resp_get = MagicMock()
+        mock_resp_get.status_code = 200
+        mock_resp_get.json.return_value = {
+            "result": {
+                "symbol": "AAPL",
+                "quantity": 10,
+                "status": "OPEN",
+                "execution": {"filledQuantity": 0}
+            }
+        }
         mock_resp_modify = MagicMock()
         mock_resp_modify.status_code = 200
         mock_resp_modify.json.return_value = {"result": {"orderId": "modified_order_id"}}
-        mock_request.side_effect = [mock_resp_modify]
+        mock_request.side_effect = [mock_resp_get, mock_resp_modify]
 
         new_id = client.modifyOrder("orig_order_id", price=160.0)
         self.assertEqual(new_id, "modified_order_id")
@@ -204,6 +216,44 @@ class TestTossTrade(unittest.TestCase):
         self.assertEqual(kwargs["json"]["orderType"], "LIMIT")
         self.assertEqual(kwargs["json"]["price"], 160.0)
         self.assertNotIn("quantity", kwargs["json"])
+
+    @patch("requests.Session.request")
+    def test_modify_order_kr(self, mock_request):
+        # 2. Test KR stock (symbol: 005930)
+        mock_resp_token = MagicMock()
+        mock_resp_token.status_code = 200
+        mock_resp_token.json.return_value = self.token_response
+        mock_resp_accounts = MagicMock()
+        mock_resp_accounts.status_code = 200
+        mock_resp_accounts.json.return_value = self.accounts_response
+        mock_request.side_effect = [mock_resp_token, mock_resp_accounts]
+
+        client = TossTrade()
+
+        # Mock responses: getOrder (symbol 005930, qty 10, filled 4) -> modifyOrder
+        mock_resp_get = MagicMock()
+        mock_resp_get.status_code = 200
+        mock_resp_get.json.return_value = {
+            "result": {
+                "symbol": "005930",
+                "quantity": 10,
+                "status": "PARTIALLY_FILLED",
+                "execution": {"filledQuantity": 4}
+            }
+        }
+        mock_resp_modify = MagicMock()
+        mock_resp_modify.status_code = 200
+        mock_resp_modify.json.return_value = {"result": {"orderId": "modified_kr_order_id"}}
+        mock_request.side_effect = [mock_resp_get, mock_resp_modify]
+
+        new_id = client.modifyOrder("orig_kr_order_id", price=80000.0)
+        self.assertEqual(new_id, "modified_kr_order_id")
+        
+        _, kwargs = mock_request.call_args
+        self.assertEqual(kwargs["json"]["orderType"], "LIMIT")
+        self.assertEqual(kwargs["json"]["price"], 80000.0)
+        # KR stock should have quantity field populated with unfilled amount (10 - 4 = 6)
+        self.assertEqual(kwargs["json"]["quantity"], 6)
 
     @patch("requests.Session.request")
     def test_cancel_order(self, mock_request):
@@ -224,6 +274,92 @@ class TestTossTrade(unittest.TestCase):
 
         cancel_id = client.cancelOrder("orig_order_id")
         self.assertEqual(cancel_id, "cancelled_order_id")
+
+    @patch("requests.Session.request")
+    def test_buy_chase_success(self, mock_request):
+        mock_resp_token = MagicMock()
+        mock_resp_token.status_code = 200
+        mock_resp_token.json.return_value = self.token_response
+        mock_resp_accounts = MagicMock()
+        mock_resp_accounts.status_code = 200
+        mock_resp_accounts.json.return_value = self.accounts_response
+        mock_request.side_effect = [mock_resp_token, mock_resp_accounts]
+
+        client = TossTrade()
+
+        # Mock requests inside buyChase:
+        # 1. getBook: bids_p=[150.0]
+        # 2. buy: orderId="chase_buy_id"
+        # 3. getOrder: status="FILLED", averageFilledPrice=150.0
+        mock_resp_book = MagicMock()
+        mock_resp_book.status_code = 200
+        mock_resp_book.json.return_value = {
+            "result": {
+                "bids": [{"price": 150.0, "volume": 100}],
+                "asks": []
+            }
+        }
+        mock_resp_buy = MagicMock()
+        mock_resp_buy.status_code = 200
+        mock_resp_buy.json.return_value = {"result": {"orderId": "chase_buy_id"}}
+        mock_resp_get = MagicMock()
+        mock_resp_get.status_code = 200
+        mock_resp_get.json.return_value = {
+            "result": {
+                "status": "FILLED",
+                "execution": {
+                    "filledQuantity": 10,
+                    "averageFilledPrice": 150.0
+                }
+            }
+        }
+        mock_request.side_effect = [mock_resp_book, mock_resp_buy, mock_resp_get]
+
+        executed_price = client.buyChase("AAPL", 10)
+        self.assertEqual(executed_price, 150.0)
+
+    @patch("requests.Session.request")
+    def test_sell_chase_cancelled(self, mock_request):
+        mock_resp_token = MagicMock()
+        mock_resp_token.status_code = 200
+        mock_resp_token.json.return_value = self.token_response
+        mock_resp_accounts = MagicMock()
+        mock_resp_accounts.status_code = 200
+        mock_resp_accounts.json.return_value = self.accounts_response
+        mock_request.side_effect = [mock_resp_token, mock_resp_accounts]
+
+        client = TossTrade()
+
+        # Mock requests inside sellChase:
+        # 1. getBook: asks_p=[150.0]
+        # 2. sell: orderId="chase_sell_id"
+        # 3. getOrder: status="CANCELLED", averageFilledPrice=0.0
+        mock_resp_book = MagicMock()
+        mock_resp_book.status_code = 200
+        mock_resp_book.json.return_value = {
+            "result": {
+                "bids": [],
+                "asks": [{"price": 150.0, "volume": 100}]
+            }
+        }
+        mock_resp_sell = MagicMock()
+        mock_resp_sell.status_code = 200
+        mock_resp_sell.json.return_value = {"result": {"orderId": "chase_sell_id"}}
+        mock_resp_get = MagicMock()
+        mock_resp_get.status_code = 200
+        mock_resp_get.json.return_value = {
+            "result": {
+                "status": "CANCELLED",
+                "execution": {
+                    "filledQuantity": 0,
+                    "averageFilledPrice": 0.0
+                }
+            }
+        }
+        mock_request.side_effect = [mock_resp_book, mock_resp_sell, mock_resp_get]
+
+        executed_price = client.sellChase("AAPL", 10)
+        self.assertEqual(executed_price, 0.0)
 
     @patch("requests.Session.request")
     def test_api_error_parsing(self, mock_request):
@@ -261,3 +397,4 @@ class TestTossTrade(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
