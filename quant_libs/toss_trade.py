@@ -242,6 +242,8 @@ class TossTrade:
         Returns:
             str: The generated order ID.
         """
+        if quantity < 0:
+            return self.sell(ticker, -quantity, price)
         order_type = "MARKET" if price == 0 else "LIMIT"
         self._logger.info(
             "buy() %s  qty=%s  price=%s  type=%s", ticker, quantity, price, order_type
@@ -277,6 +279,8 @@ class TossTrade:
         Returns:
             str: The generated order ID.
         """
+        if quantity < 0:
+            return self.buy(ticker, -quantity, price)
         order_type = "MARKET" if price == 0 else "LIMIT"
         self._logger.info(
             "sell() %s  qty=%s  price=%s  type=%s", ticker, quantity, price, order_type
@@ -322,14 +326,14 @@ class TossTrade:
         ticker = order_info.get("symbol", "")
         
         # Check if KR stock (six-digit number)
-        is_kr = ticker is not None and ticker.isdigit() and len(ticker) == 6
+        is_kr = ticker is not None and ticker[0].isdigit() and len(ticker) == 6
         
         if is_kr and quantity is None:
             total_qty = float(order_info.get("quantity") or 0)
             execution = order_info.get("execution") or {}
             filled_qty = float(execution.get("filledQuantity") or 0)
             quantity = total_qty - filled_qty
-            self._logger.info("modifyOrder() KR stock detected. Filled quantity with unfilled amount: %s", quantity)
+            self._logger.debug("modifyOrder() KR stock detected. Filled quantity with unfilled amount: %s", quantity)
 
         payload = {}
         if order_type is not None:
@@ -441,6 +445,26 @@ class TossTrade:
     # ------------------------------------------------------------------
     # Market data
     # ------------------------------------------------------------------
+
+    def getKrwUsd(self,):
+        headers = {
+            "X-Tossinvest-Account": str(self.account_seq)
+        }
+        params = {"baseCurrency": "USD", "quoteCurrency": "KRW"}
+        response = self._request("GET", "/api/v1/exchange-rate", headers=headers, params=params)
+        result = response.get("result", {})
+
+        return float(result["rate"])
+    
+    def getUsdKrw(self,):
+        headers = {
+            "X-Tossinvest-Account": str(self.account_seq)
+        }
+        params = {"baseCurrency": "KRW", "quoteCurrency": "USD"}
+        response = self._request("GET", "/api/v1/exchange-rate", headers=headers, params=params)
+        result = response.get("result", {})
+
+        return float(result["rate"])
 
     def getPrice(self, ticker):
         """
@@ -843,3 +867,137 @@ class TossTrade:
                     "sellChase() ask unchanged at %s; waiting.", price
                 )
         return filled_price
+
+    def chaseOrders(self, ticker_quantity_pairs, refresh_period=3.):
+        """
+        Places buy/sell orders for the given stock pairs and chases them in sequence.
+        Positive quantities represent buy orders (placed at current bid price).
+        Negative quantities represent sell orders (placed at current ask price).
+
+        With the given refresh period, it sweeps all open orders in sequence.
+        - Buy orders are modified to the new bid price if bid or ask rises.
+        - Sell orders are modified to the new ask price if ask or bid falls.
+
+        Returns a list of average filled prices corresponding to ticker_quantity_pairs.
+        """
+        self._logger.info("chaseOrders() called with %s.", ticker_quantity_pairs)
+        filled_prices = [0.0] * len(ticker_quantity_pairs)
+        orders = []
+
+        for idx, (ticker, qty) in enumerate(ticker_quantity_pairs):
+            if qty == 0:
+                continue
+            book = self.getBook(ticker)
+            if qty > 0:
+                if not book["bids_p"]:
+                    self._logger.warning("No bid price for %s, skipping.", ticker)
+                    continue
+                price = book["bids_p"][0]
+                order_id = self.buy(ticker, qty, price)
+                side = "BUY"
+            else:
+                if not book["asks_p"]:
+                    self._logger.warning("No ask price for %s, skipping.", ticker)
+                    continue
+                price = book["asks_p"][0]
+                order_id = self.sell(ticker, abs(qty), price)
+                side = "SELL"
+
+            orders.append({
+                "idx": idx,
+                "ticker": ticker,
+                "target_qty": abs(qty),
+                "side": side,
+                "order_id": order_id,
+                "price": price,
+                "last_bid": book["bids_p"][0] if book["bids_p"] else price,
+                "last_ask": book["asks_p"][0] if book["asks_p"] else price,
+                "status": "OPEN"
+            })
+            self._logger.info(
+                "chaseOrders() initialized %s order for %s (qty=%s, price=%s, orderId=%s)",
+                side, ticker, abs(qty), price, order_id
+            )
+
+        while True:
+            active_orders = [o for o in orders if o["status"] == "OPEN"]
+            if not active_orders:
+                break
+
+            time.sleep(refresh_period)
+
+            for o in active_orders:
+                try:
+                    order_result = self.getOrder(o["order_id"])
+                    time.sleep(0.34)
+                    status = order_result.get("status")
+                    execution = order_result.get("execution") or {}
+                    filled_qty = float(execution.get("filledQuantity") or 0)
+                    avg_price = float(execution.get("averageFilledPrice") or 0)
+
+                    self._logger.debug(
+                        "chaseOrders() checking order %s status=%s, filled_qty=%s",
+                        o["order_id"], status, filled_qty
+                    )
+
+                    if status == "FILLED" or filled_qty >= o["target_qty"]:
+                        o["status"] = "FILLED"
+                        filled_prices[o["idx"]] = avg_price
+                        self._logger.info(
+                            "chaseOrders() order for %s fully executed at price %s.",
+                            o["ticker"], avg_price
+                        )
+                        continue
+
+                    if status in ("CANCELLED", "REJECTED"):
+                        o["status"] = status
+                        filled_prices[o["idx"]] = avg_price
+                        self._logger.warning(
+                            "chaseOrders() order for %s was %s. Executed price: %s",
+                            o["ticker"], status, avg_price
+                        )
+                        continue
+
+                    # Check for price changes
+                    book = self.getBook(o["ticker"])
+                    time.sleep(0.1)
+                    if o["side"] == "BUY":
+                        if not book["bids_p"] or not book["asks_p"]:
+                            continue
+                        new_bid = book["bids_p"][0]
+                        new_ask = book["asks_p"][0]
+
+                        # Adjust price if the bid or ask rises
+                        if new_bid > o["price"] or new_ask > o["last_ask"]:
+                            self._logger.info(
+                                "chaseOrders() buy for %s: price rising (bid:%s->%s, ask:%s->%s). Modifying orderId=%s to new bid %s",
+                                o["ticker"], o["price"], new_bid, o["last_ask"], new_ask, o["order_id"], new_bid
+                            )
+                            o["order_id"] = self.modifyOrder(o["order_id"], price=new_bid)
+                            time.sleep(0.34)
+                            o["price"] = new_bid
+                        o["last_bid"] = new_bid
+                        o["last_ask"] = new_ask
+                    else:  # SELL
+                        if not book["bids_p"] or not book["asks_p"]:
+                            continue
+                        new_bid = book["bids_p"][0]
+                        new_ask = book["asks_p"][0]
+
+                        # Adjust price if the ask or bid falls
+                        if new_ask < o["price"] or new_bid < o["last_bid"]:
+                            self._logger.info(
+                                "chaseOrders() sell for %s: price falling (ask:%s->%s, bid:%s->%s). Modifying orderId=%s to new ask %s",
+                                o["ticker"], o["price"], new_ask, o["last_bid"], new_bid, o["order_id"], new_ask
+                            )
+                            o["order_id"] = self.modifyOrder(o["order_id"], price=new_ask)
+                            time.sleep(0.34)
+                            o["price"] = new_ask
+                        o["last_bid"] = new_bid
+                        o["last_ask"] = new_ask
+                except Exception as e:
+                    self._logger.error("Error in chaseOrders sweep loop for %s: %s", o["ticker"], e)
+
+        self._logger.info("chaseOrders() finished. Executed prices: %s", filled_prices)
+        return filled_prices
+
