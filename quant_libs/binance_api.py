@@ -64,10 +64,13 @@ class Binance():
     timestamp_offset = 0
 
 
-    def __init__(self, apikey="", secretkey="", test="REAL",exchange="SPOT",key_path=".",leverage=1):
+    def __init__(self, apikey=None, secretkey=None, test="REAL",exchange="SPOT",key_path=None,leverage=1):
         if test=="FAKE":
             self.fake_trading = True
-        if apikey=="":
+        if not apikey is None:
+            self.apikey = apikey
+            self.secretkey = secretkey
+        elif not key_path is None:
             fin = open(key_path, "r")
             self.apikey = fin.readline().strip()
             self.secretkey = fin.readline().strip()
@@ -76,8 +79,8 @@ class Binance():
                 print("Please fill the API Key in %s/key.txt"%key_path)
                 sys.exit()
         else:
-            self.apikey = apikey
-            self.secretkey = secretkey
+            self.api_key = os.environ.get("BINANCE_API_KEY")
+            self.secret_key = os.environ.get("BINANCE_SECRET_KEY")
         if not exchange in ["SPOT", "USDM","COINM","OPTION"]:
             print("Wrong Exchange Information. Set to SPOT")
             exchange = "SPOT"
