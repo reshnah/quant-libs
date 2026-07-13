@@ -95,6 +95,8 @@ def importCsvChartDict(csv_path):
         #    chart[s] = chart[s][1:]
     if len(chart["v"])==0:
         del chart["v"]
+    if len(chart["ac"])==0:
+        chart["ac"] = chart["c"][:]
     return chart
 
 
