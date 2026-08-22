@@ -902,6 +902,7 @@ class TossTrade:
                 price = book["asks_p"][0]
                 order_id = self.sell(ticker, abs(qty), price)
                 side = "SELL"
+            time.sleep(0.5)
 
             orders.append({
                 "idx": idx,
@@ -929,7 +930,7 @@ class TossTrade:
             for o in active_orders:
                 try:
                     order_result = self.getOrder(o["order_id"])
-                    time.sleep(0.34)
+                    #time.sleep(0.34)
                     status = order_result.get("status")
                     execution = order_result.get("execution") or {}
                     filled_qty = float(execution.get("filledQuantity") or 0)
@@ -960,7 +961,7 @@ class TossTrade:
 
                     # Check for price changes
                     book = self.getBook(o["ticker"])
-                    time.sleep(0.1)
+                    #time.sleep(0.1)
                     if o["side"] == "BUY":
                         if not book["bids_p"] or not book["asks_p"]:
                             continue
@@ -995,6 +996,7 @@ class TossTrade:
                             o["price"] = new_ask
                         o["last_bid"] = new_bid
                         o["last_ask"] = new_ask
+                    time.sleep(0.5)
                 except Exception as e:
                     self._logger.error("Error in chaseOrders sweep loop for %s: %s", o["ticker"], e)
 

@@ -362,6 +362,90 @@ class TestTossTrade(unittest.TestCase):
         self.assertEqual(executed_price, 0.0)
 
     @patch("requests.Session.request")
+    def test_chase_orders(self, mock_request):
+        mock_resp_token = MagicMock()
+        mock_resp_token.status_code = 200
+        mock_resp_token.json.return_value = self.token_response
+        mock_resp_accounts = MagicMock()
+        mock_resp_accounts.status_code = 200
+        mock_resp_accounts.json.return_value = self.accounts_response
+        mock_request.side_effect = [mock_resp_token, mock_resp_accounts]
+
+        client = TossTrade()
+
+        # Mock initial setups for order 1 (AAPL buy) and order 2 (MSFT sell)
+        # 1. AAPL getBook: bids_p=[150.0]
+        # 2. AAPL buy: orderId="buy_1"
+        # 3. MSFT getBook: asks_p=[350.0]
+        # 4. MSFT sell: orderId="sell_1"
+        mock_resp_book_aapl = MagicMock()
+        mock_resp_book_aapl.status_code = 200
+        mock_resp_book_aapl.json.return_value = {"result": {"bids": [{"price": 150.0, "volume": 10}], "asks": []}}
+        
+        mock_resp_buy = MagicMock()
+        mock_resp_buy.status_code = 200
+        mock_resp_buy.json.return_value = {"result": {"orderId": "buy_1"}}
+
+        mock_resp_book_msft = MagicMock()
+        mock_resp_book_msft.status_code = 200
+        mock_resp_book_msft.json.return_value = {"result": {"bids": [], "asks": [{"price": 350.0, "volume": 5}]}}
+
+        mock_resp_sell = MagicMock()
+        mock_resp_sell.status_code = 200
+        mock_resp_sell.json.return_value = {"result": {"orderId": "sell_1"}}
+
+        # Sweep 1:
+        # 5. getOrder for AAPL ("buy_1") -> FILLED at 150.0
+        # 6. getOrder for MSFT ("sell_1") -> OPEN
+        # 7. getBook for MSFT -> asks_p=[349.0], bids_p=[345.0]
+        # 8. getOrder for MSFT ("sell_1") -> inside modifyOrder (symbol MSFT)
+        # 9. modifyOrder for MSFT ("sell_1") -> new orderId="sell_2"
+        mock_resp_get_aapl_1 = MagicMock()
+        mock_resp_get_aapl_1.status_code = 200
+        mock_resp_get_aapl_1.json.return_value = {"result": {"status": "FILLED", "execution": {"filledQuantity": 10, "averageFilledPrice": 150.0}}}
+
+        mock_resp_get_msft_1 = MagicMock()
+        mock_resp_get_msft_1.status_code = 200
+        mock_resp_get_msft_1.json.return_value = {"result": {"status": "OPEN", "execution": {"filledQuantity": 0}}}
+
+        mock_resp_book_msft_2 = MagicMock()
+        mock_resp_book_msft_2.status_code = 200
+        mock_resp_book_msft_2.json.return_value = {"result": {"bids": [{"price": 345.0, "volume": 10}], "asks": [{"price": 349.0, "volume": 5}]}}
+
+        # modifyOrder will call getOrder first:
+        mock_resp_get_msft_modify = MagicMock()
+        mock_resp_get_msft_modify.status_code = 200
+        mock_resp_get_msft_modify.json.return_value = {
+            "result": {
+                "symbol": "MSFT",
+                "quantity": 5,
+                "status": "OPEN",
+                "execution": {"filledQuantity": 0}
+            }
+        }
+
+        mock_resp_modify_msft = MagicMock()
+        mock_resp_modify_msft.status_code = 200
+        mock_resp_modify_msft.json.return_value = {"result": {"orderId": "sell_2"}}
+
+        # Sweep 2:
+        # 10. getOrder for MSFT ("sell_2") -> FILLED at 349.0
+        mock_resp_get_msft_2 = MagicMock()
+        mock_resp_get_msft_2.status_code = 200
+        mock_resp_get_msft_2.json.return_value = {"result": {"status": "FILLED", "execution": {"filledQuantity": 5, "averageFilledPrice": 349.0}}}
+
+        mock_request.side_effect = [
+            mock_resp_book_aapl, mock_resp_buy,
+            mock_resp_book_msft, mock_resp_sell,
+            mock_resp_get_aapl_1, mock_resp_get_msft_1, mock_resp_book_msft_2,
+            mock_resp_get_msft_modify, mock_resp_modify_msft,
+            mock_resp_get_msft_2
+        ]
+
+        prices = client.chaseOrders([("AAPL", 10), ("MSFT", -5)], refresh_period=0.01)
+        self.assertEqual(prices, [150.0, 349.0])
+
+    @patch("requests.Session.request")
     def test_api_error_parsing(self, mock_request):
         mock_resp_token = MagicMock()
         mock_resp_token.status_code = 200
