@@ -5,6 +5,8 @@ import FinanceDataReader as fdr
 import pykrx
 import os
 import time
+from bisect import bisect_right
+import yfinance as yf
 
 
 def getUsTickers(listed_idx=None):
@@ -49,6 +51,8 @@ def getChart(ticker,from_date,to_date=None):
             ticker = ticker.replace("_","/")
         elif len(ticker)==4:
             ticker = ticker.replace("_","=")
+    if "." in ticker and ticker[0].isalpha():
+        ticker = ticker.replace(".", "-")
     for trial in range(5):
         try:
             df = fdr.DataReader(ticker, from_date, to_date)
@@ -68,6 +72,7 @@ def getChart(ticker,from_date,to_date=None):
                 ConnectionRefusedError,
                 ConnectionAbortedError) as err:
             print("Server Error: %s"%err)
+            if "Not Found for url" in err: break
             time.sleep(3)
             continue
     return None
@@ -216,6 +221,135 @@ def getKrxTopVolumeList(num, date=None):
         raise ValueError
     df = df.sort_values(by=['거래대금'], ascending=False)
     return list(df.index)[:num]
+
+
+
+
+_SNP500_HISTORY_URL = (
+    "https://raw.githubusercontent.com/chinobing/"
+    "historical_sp500_constituents/main/sp_500_historical_components.csv"
+)
+
+
+def _load_snp500_history():
+    df = pd.read_csv(_SNP500_HISTORY_URL)
+
+    # Normalize column names.
+    df.columns = [
+        str(column).strip().lower()
+        for column in df.columns
+    ]
+
+    # Locate date column.
+    date_column = next(
+        (c for c in df.columns if c in ("date", "datetime", "timestamp")),
+        None,
+    )
+
+    if date_column is None:
+        raise ValueError(
+            f"Could not find date column. Columns: {list(df.columns)}"
+        )
+
+    df[date_column] = pd.to_datetime(df[date_column])
+
+    # Locate ticker column.
+    ticker_column = next(
+        (
+            c
+            for c in df.columns
+            if c in ("ticker", "symbol", "constituent", "tickers")
+        ),
+        None,
+    )
+
+    if ticker_column is None:
+        raise ValueError(
+            f"Could not find ticker column. Columns: {list(df.columns)}"
+        )
+
+    date_list = []
+    member_list = []
+    for dt, group in df.groupby(date_column):
+        tickers_set = set()
+        for raw_entry in group[ticker_column]:
+            if pd.notna(raw_entry):
+                for t in str(raw_entry).split(","):
+                    t_clean = t.strip().replace(".", "-")
+                    if t_clean:
+                        tickers_set.add(t_clean)
+        date_list.append(pd.Timestamp(dt))
+        member_list.append(sorted(tickers_set))
+
+    sorted_pairs = sorted(zip(date_list, member_list), key=lambda x: x[0])
+    dates = [p[0] for p in sorted_pairs]
+    members = [p[1] for p in sorted_pairs]
+    return dates, members
+
+
+_SNP500_DATES, _SNP500_MEMBERS = _load_snp500_history()
+
+
+def getSnp500Tickers(tick: datetime.datetime) -> list[str]:
+    tick = pd.Timestamp(tick)
+
+    i = bisect_right(_SNP500_DATES, tick) - 1
+
+    if i < 0:
+        raise ValueError(
+            f"No S&P 500 constituent data available for {tick.date()}"
+        )
+    return list(_SNP500_MEMBERS[i])
+
+def getUsHistoricalEpsBvps(ticker_symbol: str, freq: str = "quarterly"):
+    """
+    Fetches historical EPS and computes BVPS.
+    freq: 'quarterly' or 'annual'
+    """
+    ticker = yf.Ticker(ticker_symbol)
+    
+    if freq == "quarterly":
+        income_stmt = ticker.quarterly_income_stmt
+        balance_sheet = ticker.quarterly_balance_sheet
+    else:
+        income_stmt = ticker.income_stmt
+        balance_sheet = ticker.balance_sheet
+        
+    df = pd.DataFrame()
+    
+    # 1. EPS (Diluted EPS is standard)
+    if "Diluted EPS" in income_stmt.index:
+        df["EPS"] = income_stmt.loc["Diluted EPS"]
+    elif "Basic EPS" in income_stmt.index:
+        df["EPS"] = income_stmt.loc["Basic EPS"]
+        
+    # 2. Book Value per Share (BVPS)
+    # Total Stockholder Equity / Ordinary (or Diluted) Shares Number
+    equity_row = None
+    for row_name in ["Stockholders Equity", "Total Equity Gross Minority Interest", "Common Stock Equity"]:
+        if row_name in balance_sheet.index:
+            equity_row = row_name
+            break
+            
+    shares_row = None
+    for row_name in ["Diluted Average Shares", "Ordinary Shares Number", "Basic Average Shares"]:
+        if row_name in income_stmt.index:
+            shares_row = income_stmt.loc[row_name]
+            break
+        elif row_name in balance_sheet.index:
+            shares_row = balance_sheet.loc[row_name]
+            break
+
+    if equity_row is not None and shares_row is not None:
+        equity = balance_sheet.loc[equity_row]
+        df["Stockholders_Equity"] = equity
+        df["Shares_Outstanding"] = shares_row
+        df["BVPS"] = equity / shares_row
+
+    # Clean and sort by date ascending
+    df.index = pd.to_datetime(df.index)
+    df = df.sort_index()
+    return df
 
 def test():
     getKospi200Tickers()
