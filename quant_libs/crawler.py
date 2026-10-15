@@ -170,11 +170,11 @@ def getKrxTopCapList(num, date=None):
         date = datetime.datetime.now()
         if date.weekday()>=5:
             date -= datetime.timedelta(days=date.weekday()-4)
-        date = date.strftime("%Y%m%d")
     for trial in range(7):
         try:
-            df = pykrx.stock.get_market_cap(date)
+            df = pykrx.stock.get_market_cap(date.strftime("%Y%m%d"))
         except:
+            raise
             date -= datetime.timedelta(days=1)
             continue
         break
@@ -187,10 +187,9 @@ def getKrxTopForeignRatioList(num, date=None):
         date = datetime.datetime.now()
         if date.weekday()>=5:
             date -= datetime.timedelta(days=date.weekday()-4)
-        date = date.strftime("%Y%m%d")
     for trial in range(7):
         try:
-            df = pykrx.stock.get_exhaustion_rates_of_foreign_investment(date, "KOSPI")
+            df = pykrx.stock.get_exhaustion_rates_of_foreign_investment(date.strftime("%Y%m%d"), "KOSPI")
         except:
             date -= datetime.timedelta(days=1)
             continue
@@ -208,11 +207,10 @@ def getKrxTopVolumeList(num, date=None):
         date = datetime.datetime.now()
         if date.weekday()>=5:
             date -= datetime.timedelta(days=date.weekday()-4)
-        date = date.strftime("%Y%m%d")
     
     for trial in range(7):
         try:
-            df = pykrx.stock.get_market_cap(date)
+            df = pykrx.stock.get_market_cap(date.strftime("%Y%m%d"))
         except:
             date -= datetime.timedelta(days=1)
             continue

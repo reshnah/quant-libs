@@ -1,0 +1,5124 @@
+{
+  "t0434": {
+    "path": "/futureoption/accno",
+    "req": {
+      "headers": [
+        {
+          "element": "content-type",
+          "name": "컨텐츠타입",
+          "type": "String",
+          "length": "100",
+          "description": "LS증권 제공 API를 호출하기 위한 Request Body 데이터 포맷으로 \"application/json; charset=utf-8 설정\""
+        },
+        {
+          "element": "authorization",
+          "name": "접근토큰",
+          "type": "String",
+          "length": "1000",
+          "description": "OAuth 토큰이 필요한 API 경우 발급한 Access Token을 설정하기 위한 Request Heaeder Parameter"
+        },
+        {
+          "element": "tr_cd",
+          "name": "거래 CD",
+          "type": "String",
+          "length": "10",
+          "description": "LS증권 거래코드"
+        },
+        {
+          "element": "tr_cont",
+          "name": "연속 거래 여부",
+          "type": "String",
+          "length": "1",
+          "description": "연속거래 여부\r\nY:연속○\r\nN:연속×"
+        },
+        {
+          "element": "tr_cont_key",
+          "name": "연속 거래 Key",
+          "type": "String",
+          "length": "18",
+          "description": "연속일 경우 그전에 내려온 연속키 값 올림"
+        },
+        {
+          "element": "mac_address",
+          "name": "MAC 주소",
+          "type": "String",
+          "length": "12",
+          "description": "법인인 경우 필수 세팅"
+        }
+      ],
+      "body": [
+        {
+          "element": "t0434InBlock",
+          "name": "t0434InBlock",
+          "type": "Object",
+          "fields": [
+            {
+              "element": "expcode",
+              "name": "종목번호",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "chegb",
+              "name": "체결구분",
+              "type": "String",
+              "length": "1",
+              "description": "0;전체\r\n1:체결\r\n2:미체결"
+            },
+            {
+              "element": "sortgb",
+              "name": "정렬순서",
+              "type": "String",
+              "length": "1",
+              "description": "1:주문번호 역순\r\n2:주문번호 순"
+            },
+            {
+              "element": "cts_ordno",
+              "name": "CTS_주문번호",
+              "type": "String",
+              "length": "7",
+              "description": "처음 조회시는 Space\r\n연속 조회시에 이전 조회한 OutBlock의 cts_ordno 값으로 설정"
+            }
+          ]
+        }
+      ]
+    },
+    "resp": {
+      "headers": [
+        {
+          "element": "content-type",
+          "name": "컨텐츠타입",
+          "type": "String",
+          "length": "100",
+          "description": "LS증권 제공 API를 호출하기 위한 Request Body 데이터 포맷으로 \"application/json; charset=utf-8 설정\""
+        },
+        {
+          "element": "tr_cd",
+          "name": "거래 CD",
+          "type": "String",
+          "length": "10",
+          "description": "LS증권 거래코드"
+        },
+        {
+          "element": "tr_cont",
+          "name": "연속 거래 여부",
+          "type": "String",
+          "length": "1",
+          "description": "연속거래 여부\r\nY:연속○\r\nN:연속×"
+        },
+        {
+          "element": "tr_cont_key",
+          "name": "연속 거래 Key",
+          "type": "String",
+          "length": "18",
+          "description": "연속일 경우 그전에 내려온 연속키 값 올림"
+        }
+      ],
+      "body": [
+        {
+          "element": "t0434OutBlock",
+          "name": "t0434OutBlock",
+          "type": "Object",
+          "fields": [
+            {
+              "element": "cts_ordno",
+              "name": "CTS_주문번호",
+              "type": "String",
+              "length": "7",
+              "description": "연속조회키\r\n연속 조회시 이 값을 InBlock의 cts_ordno 필드에 넣어준다."
+            }
+          ]
+        },
+        {
+          "element": "t0434OutBlock1",
+          "name": "t0434OutBlock1",
+          "type": "Object Array",
+          "fields": [
+            {
+              "element": "ordno",
+              "name": "주문번호",
+              "type": "Number",
+              "length": "7"
+            },
+            {
+              "element": "orgordno",
+              "name": "원주문번호",
+              "type": "Number",
+              "length": "7"
+            },
+            {
+              "element": "medosu",
+              "name": "구분",
+              "type": "String",
+              "length": "10"
+            },
+            {
+              "element": "ordgb",
+              "name": "유형",
+              "type": "String",
+              "length": "20"
+            },
+            {
+              "element": "qty",
+              "name": "주문수량",
+              "type": "Number",
+              "length": "9"
+            },
+            {
+              "element": "price",
+              "name": "주문가격",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "cheqty",
+              "name": "체결수량",
+              "type": "Number",
+              "length": "9"
+            },
+            {
+              "element": "cheprice",
+              "name": "체결가격",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "ordrem",
+              "name": "미체결잔량",
+              "type": "Number",
+              "length": "9"
+            },
+            {
+              "element": "status",
+              "name": "상태",
+              "type": "String",
+              "length": "10"
+            },
+            {
+              "element": "ordtime",
+              "name": "주문시간",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "ordermtd",
+              "name": "주문매체",
+              "type": "String",
+              "length": "10"
+            },
+            {
+              "element": "expcode",
+              "name": "종목번호",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "rtcode",
+              "name": "사유코드",
+              "type": "String",
+              "length": "3"
+            },
+            {
+              "element": "sysprocseq",
+              "name": "처리순번",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "hogatype",
+              "name": "호가타입",
+              "type": "String",
+              "length": "1"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "t2111": {
+    "path": "/futureoption/market-data",
+    "req": {
+      "headers": [
+        {
+          "element": "content-type",
+          "name": "컨텐츠타입",
+          "type": "String",
+          "length": "100",
+          "description": "LS증권 제공 API를 호출하기 위한 Request Body 데이터 포맷으로 \"application/json; charset=utf-8 설정\""
+        },
+        {
+          "element": "authorization",
+          "name": "접근토큰",
+          "type": "String",
+          "length": "1000",
+          "description": "OAuth 토큰이 필요한 API 경우 발급한 Access Token을 설정하기 위한 Request Heaeder Parameter"
+        },
+        {
+          "element": "tr_cd",
+          "name": "거래 CD",
+          "type": "String",
+          "length": "10",
+          "description": "LS증권 거래코드"
+        },
+        {
+          "element": "tr_cont",
+          "name": "연속 거래 여부",
+          "type": "String",
+          "length": "1",
+          "description": "연속거래 여부\r\nY:연속○\r\nN:연속×"
+        },
+        {
+          "element": "tr_cont_key",
+          "name": "연속 거래 Key",
+          "type": "String",
+          "length": "18",
+          "description": "연속일 경우 그전에 내려온 연속키 값 올림"
+        },
+        {
+          "element": "mac_address",
+          "name": "MAC 주소",
+          "type": "String",
+          "length": "12",
+          "description": "법인인 경우 필수 세팅"
+        }
+      ],
+      "body": [
+        {
+          "element": "t2111InBlock",
+          "name": "t2111InBlock",
+          "type": "Object",
+          "fields": [
+            {
+              "element": "focode",
+              "name": "단축코드",
+              "type": "String",
+              "length": "8"
+            }
+          ]
+        }
+      ]
+    },
+    "resp": {
+      "headers": [
+        {
+          "element": "content-type",
+          "name": "컨텐츠타입",
+          "type": "String",
+          "length": "100",
+          "description": "LS증권 제공 API를 호출하기 위한 Request Body 데이터 포맷으로 \"application/json; charset=utf-8 설정\""
+        },
+        {
+          "element": "tr_cd",
+          "name": "거래 CD",
+          "type": "String",
+          "length": "10",
+          "description": "LS증권 거래코드"
+        },
+        {
+          "element": "tr_cont",
+          "name": "연속 거래 여부",
+          "type": "String",
+          "length": "1",
+          "description": "연속거래 여부\r\nY:연속○\r\nN:연속×"
+        },
+        {
+          "element": "tr_cont_key",
+          "name": "연속 거래 Key",
+          "type": "String",
+          "length": "18",
+          "description": "연속일 경우 그전에 내려온 연속키 값 올림"
+        }
+      ],
+      "body": [
+        {
+          "element": "t2111OutBlock",
+          "name": "t2111OutBlock",
+          "type": "Object",
+          "fields": [
+            {
+              "element": "hname",
+              "name": "한글명",
+              "type": "String",
+              "length": "20"
+            },
+            {
+              "element": "price",
+              "name": "현재가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "sign",
+              "name": "전일대비구분",
+              "type": "String",
+              "length": "1",
+              "description": "1:상한 2:상승 3:보합 4:하한 5:하락"
+            },
+            {
+              "element": "change",
+              "name": "전일대비",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "jnilclose",
+              "name": "전일종가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "diff",
+              "name": "등락율",
+              "type": "Number",
+              "length": "6.2"
+            },
+            {
+              "element": "volume",
+              "name": "거래량",
+              "type": "Number",
+              "length": "12"
+            },
+            {
+              "element": "value",
+              "name": "거래대금",
+              "type": "Number",
+              "length": "12"
+            },
+            {
+              "element": "mgjv",
+              "name": "미결제량",
+              "type": "Number",
+              "length": "8"
+            },
+            {
+              "element": "mgjvdiff",
+              "name": "미결제증감",
+              "type": "Number",
+              "length": "8"
+            },
+            {
+              "element": "open",
+              "name": "시가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "high",
+              "name": "고가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "low",
+              "name": "저가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "uplmtprice",
+              "name": "상한가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "dnlmtprice",
+              "name": "하한가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "high52w",
+              "name": "52최고가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "low52w",
+              "name": "52최저가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "basis",
+              "name": "베이시스",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "recprice",
+              "name": "기준가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "theoryprice",
+              "name": "이론가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "glyl",
+              "name": "괴리율",
+              "type": "Number",
+              "length": "6.3"
+            },
+            {
+              "element": "cbhprice",
+              "name": "CB상한가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "cblprice",
+              "name": "CB하한가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "lastmonth",
+              "name": "만기일",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "jandatecnt",
+              "name": "잔여일",
+              "type": "Number",
+              "length": "8"
+            },
+            {
+              "element": "pricejisu",
+              "name": "종합지수",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "jisusign",
+              "name": "종합지수전일대비구분",
+              "type": "String",
+              "length": "1",
+              "description": "1:상한 2:상승 3:보합 4:하한 5:하락"
+            },
+            {
+              "element": "jisuchange",
+              "name": "종합지수전일대비",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "jisudiff",
+              "name": "종합지수등락율",
+              "type": "Number",
+              "length": "6.2"
+            },
+            {
+              "element": "kospijisu",
+              "name": "KOSPI200지수",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "kospisign",
+              "name": "KOSPI200전일대비구분",
+              "type": "String",
+              "length": "1",
+              "description": "1:상한 2:상승 3:보합 4:하한 5:하락"
+            },
+            {
+              "element": "kospichange",
+              "name": "KOSPI200전일대비",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "kospidiff",
+              "name": "KOSPI200등락율",
+              "type": "Number",
+              "length": "6.2"
+            },
+            {
+              "element": "listhprice",
+              "name": "상장최고가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "listlprice",
+              "name": "상장최저가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "delt",
+              "name": "델타",
+              "type": "Number",
+              "length": "6.4"
+            },
+            {
+              "element": "gama",
+              "name": "감마",
+              "type": "Number",
+              "length": "6.4"
+            },
+            {
+              "element": "ceta",
+              "name": "세타",
+              "type": "Number",
+              "length": "6.4"
+            },
+            {
+              "element": "vega",
+              "name": "베가",
+              "type": "Number",
+              "length": "6.4"
+            },
+            {
+              "element": "rhox",
+              "name": "로우",
+              "type": "Number",
+              "length": "6.4"
+            },
+            {
+              "element": "gmprice",
+              "name": "근월물현재가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "gmsign",
+              "name": "근월물전일대비구분",
+              "type": "String",
+              "length": "1"
+            },
+            {
+              "element": "gmchange",
+              "name": "근월물전일대비",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "gmdiff",
+              "name": "근월물등락율",
+              "type": "Number",
+              "length": "6.2"
+            },
+            {
+              "element": "theorypriceg",
+              "name": "이론가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "histimpv",
+              "name": "역사적변동성",
+              "type": "Number",
+              "length": "6.2"
+            },
+            {
+              "element": "impv",
+              "name": "내재변동성",
+              "type": "Number",
+              "length": "6.2"
+            },
+            {
+              "element": "sbasis",
+              "name": "시장BASIS",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "ibasis",
+              "name": "이론BASIS",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "gmfutcode",
+              "name": "근월물종목코드",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "actprice",
+              "name": "행사가",
+              "type": "Number",
+              "length": "6.2"
+            },
+            {
+              "element": "greeks_time",
+              "name": "거래소민감도수신시간",
+              "type": "String",
+              "length": "6"
+            },
+            {
+              "element": "greeks_confirm",
+              "name": "거래소민감도확정여부",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "danhochk",
+              "name": "단일가호가여부",
+              "type": "String",
+              "length": "1"
+            },
+            {
+              "element": "yeprice",
+              "name": "예상체결가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "jnilysign",
+              "name": "예상체결가전일종가대비구분",
+              "type": "String",
+              "length": "1"
+            },
+            {
+              "element": "jnilychange",
+              "name": "예상체결가전일종가대비",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "jnilydrate",
+              "name": "예상체결가전일종가등락율",
+              "type": "Number",
+              "length": "6.2"
+            },
+            {
+              "element": "alloc_gubun",
+              "name": "배분구분(1:배분개시2:배분해제0:미발생)",
+              "type": "String",
+              "length": "1"
+            },
+            {
+              "element": "bjandatecnt",
+              "name": "잔여일(영업일)",
+              "type": "Number",
+              "length": "8"
+            },
+            {
+              "element": "focode",
+              "name": "종목코드",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "dy_gubun",
+              "name": "실시간가격제한여부(0:대상아님1:적용중2:미적용중3:일시해제)",
+              "type": "String",
+              "length": "1"
+            },
+            {
+              "element": "dy_uplmtprice",
+              "name": "실시간상한가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "dy_dnlmtprice",
+              "name": "실시간하한가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "updnstep_gubun",
+              "name": "가격제한폭확대(0:미확대1:확대2:대상아님)",
+              "type": "String",
+              "length": "1"
+            },
+            {
+              "element": "upstep",
+              "name": "상한적용단계",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "dnstep",
+              "name": "하한적용단계",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "uplmtprice_3rd",
+              "name": "3단계상한가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "dnlmtprice_3rd",
+              "name": "3단계하한가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "expct_ccls_q",
+              "name": "예상체결수량",
+              "type": "Number",
+              "length": "9"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "t2112": {
+    "path": "/futureoption/market-data",
+    "req": {
+      "headers": [
+        {
+          "element": "content-type",
+          "name": "컨텐츠타입",
+          "type": "String",
+          "length": "100",
+          "description": "LS증권 제공 API를 호출하기 위한 Request Body 데이터 포맷으로 \"application/json; charset=utf-8 설정\""
+        },
+        {
+          "element": "authorization",
+          "name": "접근토큰",
+          "type": "String",
+          "length": "1000",
+          "description": "OAuth 토큰이 필요한 API 경우 발급한 Access Token을 설정하기 위한 Request Heaeder Parameter"
+        },
+        {
+          "element": "tr_cd",
+          "name": "거래 CD",
+          "type": "String",
+          "length": "10",
+          "description": "LS증권 거래코드"
+        },
+        {
+          "element": "tr_cont",
+          "name": "연속 거래 여부",
+          "type": "String",
+          "length": "1",
+          "description": "연속거래 여부\r\nY:연속○\r\nN:연속×"
+        },
+        {
+          "element": "tr_cont_key",
+          "name": "연속 거래 Key",
+          "type": "String",
+          "length": "18",
+          "description": "연속일 경우 그전에 내려온 연속키 값 올림"
+        },
+        {
+          "element": "mac_address",
+          "name": "MAC 주소",
+          "type": "String",
+          "length": "12",
+          "description": "법인인 경우 필수 세팅"
+        }
+      ],
+      "body": [
+        {
+          "element": "t2112InBlock",
+          "name": "t2112InBlock",
+          "type": "Object",
+          "fields": [
+            {
+              "element": "shcode",
+              "name": "단축코드",
+              "type": "String",
+              "length": "8"
+            }
+          ]
+        }
+      ]
+    },
+    "resp": {
+      "headers": [
+        {
+          "element": "content-type",
+          "name": "컨텐츠타입",
+          "type": "String",
+          "length": "100",
+          "description": "LS증권 제공 API를 호출하기 위한 Request Body 데이터 포맷으로 \"application/json; charset=utf-8 설정\""
+        },
+        {
+          "element": "tr_cd",
+          "name": "거래 CD",
+          "type": "String",
+          "length": "10",
+          "description": "LS증권 거래코드"
+        },
+        {
+          "element": "tr_cont",
+          "name": "연속 거래 여부",
+          "type": "String",
+          "length": "1",
+          "description": "연속거래 여부\r\nY:연속○\r\nN:연속×"
+        },
+        {
+          "element": "tr_cont_key",
+          "name": "연속 거래 Key",
+          "type": "String",
+          "length": "18",
+          "description": "연속일 경우 그전에 내려온 연속키 값 올림"
+        }
+      ],
+      "body": [
+        {
+          "element": "t2112OutBlock",
+          "name": "t2112OutBlock",
+          "type": "Object",
+          "fields": [
+            {
+              "element": "hname",
+              "name": "종목명",
+              "type": "String",
+              "length": "20"
+            },
+            {
+              "element": "price",
+              "name": "현재가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "sign",
+              "name": "전일대비구분",
+              "type": "String",
+              "length": "1",
+              "description": "1:상한\r\n2:상승\r\n3:보합\r\n4:하한\r\n5:하락"
+            },
+            {
+              "element": "change",
+              "name": "전일대비",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "diff",
+              "name": "등락율",
+              "type": "Number",
+              "length": "6.2"
+            },
+            {
+              "element": "volume",
+              "name": "거래량",
+              "type": "Number",
+              "length": "12"
+            },
+            {
+              "element": "stimeqrt",
+              "name": "거래량전일동시간비율",
+              "type": "Number",
+              "length": "6.2"
+            },
+            {
+              "element": "jnilclose",
+              "name": "전일종가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "offerho1",
+              "name": "매도호가1",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "bidho1",
+              "name": "매수호가1",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "offerrem1",
+              "name": "매도호가수량1",
+              "type": "Number",
+              "length": "8"
+            },
+            {
+              "element": "bidrem1",
+              "name": "매수호가수량1",
+              "type": "Number",
+              "length": "8"
+            },
+            {
+              "element": "dcnt1",
+              "name": "매도호가건수1",
+              "type": "Number",
+              "length": "8"
+            },
+            {
+              "element": "scnt1",
+              "name": "매수호가건수1",
+              "type": "Number",
+              "length": "8"
+            },
+            {
+              "element": "offerho2",
+              "name": "매도호가2",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "bidho2",
+              "name": "매수호가2",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "offerrem2",
+              "name": "매도호가수량2",
+              "type": "Number",
+              "length": "8"
+            },
+            {
+              "element": "bidrem2",
+              "name": "매수호가수량2",
+              "type": "Number",
+              "length": "8"
+            },
+            {
+              "element": "dcnt2",
+              "name": "매도호가건수2",
+              "type": "Number",
+              "length": "8"
+            },
+            {
+              "element": "scnt2",
+              "name": "매수호가건수2",
+              "type": "Number",
+              "length": "8"
+            },
+            {
+              "element": "offerho3",
+              "name": "매도호가3",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "bidho3",
+              "name": "매수호가3",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "offerrem3",
+              "name": "매도호가수량3",
+              "type": "Number",
+              "length": "8"
+            },
+            {
+              "element": "bidrem3",
+              "name": "매수호가수량3",
+              "type": "Number",
+              "length": "8"
+            },
+            {
+              "element": "dcnt3",
+              "name": "매도호가건수3",
+              "type": "Number",
+              "length": "8"
+            },
+            {
+              "element": "scnt3",
+              "name": "매수호가건수3",
+              "type": "Number",
+              "length": "8"
+            },
+            {
+              "element": "offerho4",
+              "name": "매도호가4",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "bidho4",
+              "name": "매수호가4",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "offerrem4",
+              "name": "매도호가수량4",
+              "type": "Number",
+              "length": "8"
+            },
+            {
+              "element": "bidrem4",
+              "name": "매수호가수량4",
+              "type": "Number",
+              "length": "8"
+            },
+            {
+              "element": "dcnt4",
+              "name": "매도호가건수4",
+              "type": "Number",
+              "length": "8"
+            },
+            {
+              "element": "scnt4",
+              "name": "매수호가건수4",
+              "type": "Number",
+              "length": "8"
+            },
+            {
+              "element": "offerho5",
+              "name": "매도호가5",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "bidho5",
+              "name": "매수호가5",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "offerrem5",
+              "name": "매도호가수량5",
+              "type": "Number",
+              "length": "8"
+            },
+            {
+              "element": "bidrem5",
+              "name": "매수호가수량5",
+              "type": "Number",
+              "length": "8"
+            },
+            {
+              "element": "dcnt5",
+              "name": "매도호가건수5",
+              "type": "Number",
+              "length": "8"
+            },
+            {
+              "element": "scnt5",
+              "name": "매수호가건수5",
+              "type": "Number",
+              "length": "8"
+            },
+            {
+              "element": "dvol",
+              "name": "매도호가총수량",
+              "type": "Number",
+              "length": "8"
+            },
+            {
+              "element": "svol",
+              "name": "매수호가총수량",
+              "type": "Number",
+              "length": "8"
+            },
+            {
+              "element": "toffernum",
+              "name": "총매도호가건수",
+              "type": "Number",
+              "length": "8"
+            },
+            {
+              "element": "tbidnum",
+              "name": "총매수호가건수",
+              "type": "Number",
+              "length": "8"
+            },
+            {
+              "element": "time",
+              "name": "수신시간",
+              "type": "String",
+              "length": "6"
+            },
+            {
+              "element": "shcode",
+              "name": "단축코드",
+              "type": "String",
+              "length": "8"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "CFOAT00100": {
+    "path": "/futureoption/order",
+    "req": {
+      "headers": [
+        {
+          "element": "content-type",
+          "name": "컨텐츠타입",
+          "type": "String",
+          "length": "100",
+          "description": "LS증권 제공 API를 호출하기 위한 Request Body 데이터 포맷으로 \"application/json; charset=utf-8 설정\""
+        },
+        {
+          "element": "authorization",
+          "name": "접근토큰",
+          "type": "String",
+          "length": "1000",
+          "description": "OAuth 토큰이 필요한 API 경우 발급한 Access Token을 설정하기 위한 Request Heaeder Parameter"
+        },
+        {
+          "element": "tr_cd",
+          "name": "거래 CD",
+          "type": "String",
+          "length": "10",
+          "description": "LS증권 거래코드"
+        },
+        {
+          "element": "tr_cont",
+          "name": "연속 거래 여부",
+          "type": "String",
+          "length": "1",
+          "description": "연속거래 여부\r\nY:연속○\r\nN:연속×"
+        },
+        {
+          "element": "tr_cont_key",
+          "name": "연속 거래 Key",
+          "type": "String",
+          "length": "18",
+          "description": "연속일 경우 그전에 내려온 연속키 값 올림"
+        },
+        {
+          "element": "mac_address",
+          "name": "MAC 주소",
+          "type": "String",
+          "length": "12",
+          "description": "법인인 경우 필수 세팅"
+        }
+      ],
+      "body": [
+        {
+          "element": "CFOAT00100InBlock1",
+          "name": "CFOAT00100InBlock1",
+          "type": "Object",
+          "fields": [
+            {
+              "element": "FnoIsuNo",
+              "name": "선물옵션종목번호",
+              "type": "String",
+              "length": "12"
+            },
+            {
+              "element": "BnsTpCode",
+              "name": "매매구분",
+              "type": "String",
+              "length": "1",
+              "description": "1@매도\r\n2@매수"
+            },
+            {
+              "element": "FnoOrdprcPtnCode",
+              "name": "선물옵션호가유형코드",
+              "type": "String",
+              "length": "2",
+              "description": "00@지정가\r\n03@시장가\r\n05@조건부지정가\r\n06@최유리지정가\r\n10@지정가(IOC)\r\n20@지정가(FOK)\r\n13@시장가(IOC)\r\n23@시장가(FOK)\r\n16@최유리지정가(IOC)\r\n26@최유리지정가(FOK)"
+            },
+            {
+              "element": "FnoOrdPrc",
+              "name": "선물옵션주문가격",
+              "type": "Number",
+              "length": "27.8"
+            },
+            {
+              "element": "OrdQty",
+              "name": "주문수량",
+              "type": "Number",
+              "length": "16"
+            }
+          ]
+        }
+      ]
+    },
+    "resp": {
+      "headers": [
+        {
+          "element": "content-type",
+          "name": "컨텐츠타입",
+          "type": "String",
+          "length": "100",
+          "description": "LS증권 제공 API를 호출하기 위한 Request Body 데이터 포맷으로 \"application/json; charset=utf-8 설정\""
+        },
+        {
+          "element": "tr_cd",
+          "name": "거래 CD",
+          "type": "String",
+          "length": "10",
+          "description": "LS증권 거래코드"
+        },
+        {
+          "element": "tr_cont",
+          "name": "연속 거래 여부",
+          "type": "String",
+          "length": "1",
+          "description": "연속거래 여부\r\nY:연속○\r\nN:연속×"
+        },
+        {
+          "element": "tr_cont_key",
+          "name": "연속 거래 Key",
+          "type": "String",
+          "length": "18",
+          "description": "연속일 경우 그전에 내려온 연속키 값 올림"
+        }
+      ],
+      "body": [
+        {
+          "element": "CFOAT00100OutBlock1",
+          "name": "CFOAT00100OutBlock1",
+          "type": "Object",
+          "fields": [
+            {
+              "element": "RecCnt",
+              "name": "레코드갯수",
+              "type": "Number",
+              "length": "5"
+            },
+            {
+              "element": "OrdMktCode",
+              "name": "주문시장코드",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "AcntNo",
+              "name": "계좌번호",
+              "type": "String",
+              "length": "20"
+            },
+            {
+              "element": "Pwd",
+              "name": "비밀번호",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "FnoIsuNo",
+              "name": "선물옵션종목번호",
+              "type": "String",
+              "length": "12"
+            },
+            {
+              "element": "BnsTpCode",
+              "name": "매매구분",
+              "type": "String",
+              "length": "1"
+            },
+            {
+              "element": "FnoOrdPtnCode",
+              "name": "선물옵션주문유형코드",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "FnoOrdprcPtnCode",
+              "name": "선물옵션호가유형코드",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "FnoTrdPtnCode",
+              "name": "선물옵션거래유형코드",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "FnoOrdPrc",
+              "name": "선물옵션주문가격",
+              "type": "Number",
+              "length": "27.8"
+            },
+            {
+              "element": "OrdQty",
+              "name": "주문수량",
+              "type": "Number",
+              "length": "16"
+            },
+            {
+              "element": "CommdaCode",
+              "name": "통신매체코드",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "DscusBnsCmpltTime",
+              "name": "협의매매완료시각",
+              "type": "String",
+              "length": "9"
+            },
+            {
+              "element": "GrpId",
+              "name": "그룹ID",
+              "type": "String",
+              "length": "20"
+            },
+            {
+              "element": "OrdSeqno",
+              "name": "주문일련번호",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "PtflNo",
+              "name": "포트폴리오번호",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "BskNo",
+              "name": "바스켓번호",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "TrchNo",
+              "name": "트렌치번호",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "ItemNo",
+              "name": "항목번호",
+              "type": "Number",
+              "length": "16"
+            },
+            {
+              "element": "OpDrtnNo",
+              "name": "운용지시번호",
+              "type": "String",
+              "length": "12"
+            },
+            {
+              "element": "MgempNo",
+              "name": "관리사원번호",
+              "type": "String",
+              "length": "9"
+            },
+            {
+              "element": "FundId",
+              "name": "펀드ID",
+              "type": "String",
+              "length": "12"
+            },
+            {
+              "element": "FundOrdNo",
+              "name": "펀드주문번호",
+              "type": "Number",
+              "length": "10"
+            }
+          ]
+        },
+        {
+          "element": "CFOAT00100OutBlock2",
+          "name": "CFOAT00100OutBlock2",
+          "type": "Object",
+          "fields": [
+            {
+              "element": "RecCnt",
+              "name": "레코드갯수",
+              "type": "Number",
+              "length": "5"
+            },
+            {
+              "element": "OrdNo",
+              "name": "주문번호",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "BrnNm",
+              "name": "지점명",
+              "type": "String",
+              "length": "40"
+            },
+            {
+              "element": "AcntNm",
+              "name": "계좌명",
+              "type": "String",
+              "length": "40"
+            },
+            {
+              "element": "IsuNm",
+              "name": "종목명",
+              "type": "String",
+              "length": "50"
+            },
+            {
+              "element": "OrdAbleAmt",
+              "name": "주문가능금액",
+              "type": "Number",
+              "length": "16"
+            },
+            {
+              "element": "MnyOrdAbleAmt",
+              "name": "현금주문가능금액",
+              "type": "Number",
+              "length": "16"
+            },
+            {
+              "element": "OrdMgn",
+              "name": "주문증거금",
+              "type": "Number",
+              "length": "16"
+            },
+            {
+              "element": "MnyOrdMgn",
+              "name": "현금주문증거금",
+              "type": "Number",
+              "length": "16"
+            },
+            {
+              "element": "OrdAbleQty",
+              "name": "주문가능수량",
+              "type": "Number",
+              "length": "16"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "CFOAT00200": {
+    "path": "/futureoption/order",
+    "req": {
+      "headers": [
+        {
+          "element": "content-type",
+          "name": "컨텐츠타입",
+          "type": "String",
+          "length": "100",
+          "description": "LS증권 제공 API를 호출하기 위한 Request Body 데이터 포맷으로 \"application/json; charset=utf-8 설정\""
+        },
+        {
+          "element": "authorization",
+          "name": "접근토큰",
+          "type": "String",
+          "length": "1000",
+          "description": "OAuth 토큰이 필요한 API 경우 발급한 Access Token을 설정하기 위한 Request Heaeder Parameter"
+        },
+        {
+          "element": "tr_cd",
+          "name": "거래 CD",
+          "type": "String",
+          "length": "10",
+          "description": "LS증권 거래코드"
+        },
+        {
+          "element": "tr_cont",
+          "name": "연속 거래 여부",
+          "type": "String",
+          "length": "1",
+          "description": "연속거래 여부\r\nY:연속○\r\nN:연속×"
+        },
+        {
+          "element": "tr_cont_key",
+          "name": "연속 거래 Key",
+          "type": "String",
+          "length": "18",
+          "description": "연속일 경우 그전에 내려온 연속키 값 올림"
+        },
+        {
+          "element": "mac_address",
+          "name": "MAC 주소",
+          "type": "String",
+          "length": "12",
+          "description": "법인인 경우 필수 세팅"
+        }
+      ],
+      "body": [
+        {
+          "element": "CFOAT00200InBlock1",
+          "name": "CFOAT00200InBlock1",
+          "type": "Object",
+          "fields": [
+            {
+              "element": "FnoIsuNo",
+              "name": "선물옵션종목번호",
+              "type": "String",
+              "length": "12"
+            },
+            {
+              "element": "OrgOrdNo",
+              "name": "원주문번호",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "FnoOrdprcPtnCode",
+              "name": "선물옵션호가유형코드",
+              "type": "String",
+              "length": "2",
+              "description": "00@지정가\r\n03@시장가\r\n05@조건부지정가\r\n06@최유리지정가\r\n10@지정가(IOC)\r\n20@지정가(FOK)\r\n13@시장가(IOC)\r\n23@시장가(FOK)\r\n16@최유리지정가(IOC)\r\n26@최유리지정가(FOK)"
+            },
+            {
+              "element": "FnoOrdPrc",
+              "name": "선물옵션주문가격",
+              "type": "Number",
+              "length": "27.8"
+            },
+            {
+              "element": "MdfyQty",
+              "name": "정정수량",
+              "type": "Number",
+              "length": "16"
+            }
+          ]
+        }
+      ]
+    },
+    "resp": {
+      "headers": [
+        {
+          "element": "content-type",
+          "name": "컨텐츠타입",
+          "type": "String",
+          "length": "100",
+          "description": "LS증권 제공 API를 호출하기 위한 Request Body 데이터 포맷으로 \"application/json; charset=utf-8 설정\""
+        },
+        {
+          "element": "tr_cd",
+          "name": "거래 CD",
+          "type": "String",
+          "length": "10",
+          "description": "LS증권 거래코드"
+        },
+        {
+          "element": "tr_cont",
+          "name": "연속 거래 여부",
+          "type": "String",
+          "length": "1",
+          "description": "연속거래 여부\r\nY:연속○\r\nN:연속×"
+        },
+        {
+          "element": "tr_cont_key",
+          "name": "연속 거래 Key",
+          "type": "String",
+          "length": "18",
+          "description": "연속일 경우 그전에 내려온 연속키 값 올림"
+        }
+      ],
+      "body": [
+        {
+          "element": "CFOAT00200OutBlock1",
+          "name": "CFOAT00200OutBlock1",
+          "type": "Object",
+          "fields": [
+            {
+              "element": "RecCnt",
+              "name": "레코드갯수",
+              "type": "Number",
+              "length": "5"
+            },
+            {
+              "element": "OrdMktCode",
+              "name": "주문시장코드",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "AcntNo",
+              "name": "계좌번호",
+              "type": "String",
+              "length": "20"
+            },
+            {
+              "element": "Pwd",
+              "name": "비밀번호",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "FnoIsuNo",
+              "name": "선물옵션종목번호",
+              "type": "String",
+              "length": "12"
+            },
+            {
+              "element": "FnoOrdPtnCode",
+              "name": "선물옵션주문유형코드",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "OrgOrdNo",
+              "name": "원주문번호",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "FnoOrdprcPtnCode",
+              "name": "선물옵션호가유형코드",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "FnoOrdPrc",
+              "name": "선물옵션주문가격",
+              "type": "Number",
+              "length": "27.8"
+            },
+            {
+              "element": "MdfyQty",
+              "name": "정정수량",
+              "type": "Number",
+              "length": "16"
+            },
+            {
+              "element": "CommdaCode",
+              "name": "통신매체코드",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "DscusBnsCmpltTime",
+              "name": "협의매매완료시각",
+              "type": "String",
+              "length": "9"
+            },
+            {
+              "element": "GrpId",
+              "name": "그룹ID",
+              "type": "String",
+              "length": "20"
+            },
+            {
+              "element": "OrdSeqno",
+              "name": "주문일련번호",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "PtflNo",
+              "name": "포트폴리오번호",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "BskNo",
+              "name": "바스켓번호",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "TrchNo",
+              "name": "트렌치번호",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "ItemNo",
+              "name": "아이템번호",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "MgempNo",
+              "name": "관리사원번호",
+              "type": "String",
+              "length": "9"
+            },
+            {
+              "element": "FundId",
+              "name": "펀드ID",
+              "type": "String",
+              "length": "12"
+            },
+            {
+              "element": "FundOrgOrdNo",
+              "name": "펀드원주문번호",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "FundOrdNo",
+              "name": "펀드주문번호",
+              "type": "Number",
+              "length": "10"
+            }
+          ]
+        },
+        {
+          "element": "CFOAT00200OutBlock2",
+          "name": "CFOAT00200OutBlock2",
+          "type": "Object",
+          "fields": [
+            {
+              "element": "RecCnt",
+              "name": "레코드갯수",
+              "type": "Number",
+              "length": "5"
+            },
+            {
+              "element": "OrdNo",
+              "name": "주문번호",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "BrnNm",
+              "name": "지점명",
+              "type": "String",
+              "length": "40"
+            },
+            {
+              "element": "AcntNm",
+              "name": "계좌명",
+              "type": "String",
+              "length": "40"
+            },
+            {
+              "element": "IsuNm",
+              "name": "종목명",
+              "type": "String",
+              "length": "50"
+            },
+            {
+              "element": "OrdAbleAmt",
+              "name": "주문가능금액",
+              "type": "Number",
+              "length": "16"
+            },
+            {
+              "element": "MnyOrdAbleAmt",
+              "name": "현금주문가능금액",
+              "type": "Number",
+              "length": "16"
+            },
+            {
+              "element": "OrdMgn",
+              "name": "주문증거금액",
+              "type": "Number",
+              "length": "16"
+            },
+            {
+              "element": "MnyOrdMgn",
+              "name": "현금주문증거금액",
+              "type": "Number",
+              "length": "16"
+            },
+            {
+              "element": "OrdAbleQty",
+              "name": "주문가능수량",
+              "type": "Number",
+              "length": "16"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "CFOAT00300": {
+    "path": "/futureoption/order",
+    "req": {
+      "headers": [
+        {
+          "element": "content-type",
+          "name": "컨텐츠타입",
+          "type": "String",
+          "length": "100",
+          "description": "LS증권 제공 API를 호출하기 위한 Request Body 데이터 포맷으로 \"application/json; charset=utf-8 설정\""
+        },
+        {
+          "element": "authorization",
+          "name": "접근토큰",
+          "type": "String",
+          "length": "1000",
+          "description": "OAuth 토큰이 필요한 API 경우 발급한 Access Token을 설정하기 위한 Request Heaeder Parameter"
+        },
+        {
+          "element": "tr_cd",
+          "name": "거래 CD",
+          "type": "String",
+          "length": "10",
+          "description": "LS증권 거래코드"
+        },
+        {
+          "element": "tr_cont",
+          "name": "연속 거래 여부",
+          "type": "String",
+          "length": "1",
+          "description": "연속거래 여부\r\nY:연속○\r\nN:연속×"
+        },
+        {
+          "element": "tr_cont_key",
+          "name": "연속 거래 Key",
+          "type": "String",
+          "length": "18",
+          "description": "연속일 경우 그전에 내려온 연속키 값 올림"
+        },
+        {
+          "element": "mac_address",
+          "name": "MAC 주소",
+          "type": "String",
+          "length": "12",
+          "description": "법인인 경우 필수 세팅"
+        }
+      ],
+      "body": [
+        {
+          "element": "CFOAT00300InBlock1",
+          "name": "CFOAT00300InBlock1",
+          "type": "Object",
+          "fields": [
+            {
+              "element": "FnoIsuNo",
+              "name": "선물옵션종목번호",
+              "type": "String",
+              "length": "12"
+            },
+            {
+              "element": "OrgOrdNo",
+              "name": "원주문번호",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "CancQty",
+              "name": "취소수량",
+              "type": "Number",
+              "length": "16"
+            }
+          ]
+        }
+      ]
+    },
+    "resp": {
+      "headers": [
+        {
+          "element": "content-type",
+          "name": "컨텐츠타입",
+          "type": "String",
+          "length": "100",
+          "description": "LS증권 제공 API를 호출하기 위한 Request Body 데이터 포맷으로 \"application/json; charset=utf-8 설정\""
+        },
+        {
+          "element": "tr_cd",
+          "name": "거래 CD",
+          "type": "String",
+          "length": "10",
+          "description": "LS증권 거래코드"
+        },
+        {
+          "element": "tr_cont",
+          "name": "연속 거래 여부",
+          "type": "String",
+          "length": "1",
+          "description": "연속거래 여부\r\nY:연속○\r\nN:연속×"
+        },
+        {
+          "element": "tr_cont_key",
+          "name": "연속 거래 Key",
+          "type": "String",
+          "length": "18",
+          "description": "연속일 경우 그전에 내려온 연속키 값 올림"
+        }
+      ],
+      "body": [
+        {
+          "element": "CFOAT00300OutBlock1",
+          "name": "CFOAT00300OutBlock1",
+          "type": "Object",
+          "fields": [
+            {
+              "element": "RecCnt",
+              "name": "레코드갯수",
+              "type": "Number",
+              "length": "5"
+            },
+            {
+              "element": "OrdMktCode",
+              "name": "주문시장코드",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "AcntNo",
+              "name": "계좌번호",
+              "type": "String",
+              "length": "20"
+            },
+            {
+              "element": "Pwd",
+              "name": "비밀번호",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "FnoIsuNo",
+              "name": "선물옵션종목번호",
+              "type": "String",
+              "length": "12"
+            },
+            {
+              "element": "FnoOrdPtnCode",
+              "name": "선물옵션주문유형코드",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "OrgOrdNo",
+              "name": "원주문번호",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "CancQty",
+              "name": "취소수량",
+              "type": "Number",
+              "length": "16"
+            },
+            {
+              "element": "CommdaCode",
+              "name": "통신매체코드",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "DscusBnsCmpltTime",
+              "name": "협의매매완료시각",
+              "type": "String",
+              "length": "9"
+            },
+            {
+              "element": "GrpId",
+              "name": "그룹ID",
+              "type": "String",
+              "length": "20"
+            },
+            {
+              "element": "OrdSeqno",
+              "name": "주문일련번호",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "PtflNo",
+              "name": "포트폴리오번호",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "BskNo",
+              "name": "바스켓번호",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "TrchNo",
+              "name": "트렌치번호",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "ItemNo",
+              "name": "아이템번호",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "MgempNo",
+              "name": "관리사원번호",
+              "type": "String",
+              "length": "9"
+            },
+            {
+              "element": "FundId",
+              "name": "펀드ID",
+              "type": "String",
+              "length": "12"
+            },
+            {
+              "element": "FundOrgOrdNo",
+              "name": "펀드원주문번호",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "FundOrdNo",
+              "name": "펀드주문번호",
+              "type": "Number",
+              "length": "10"
+            }
+          ]
+        },
+        {
+          "element": "CFOAT00300OutBlock2",
+          "name": "CFOAT00300OutBlock2",
+          "type": "Object",
+          "fields": [
+            {
+              "element": "RecCnt",
+              "name": "레코드갯수",
+              "type": "Number",
+              "length": "5"
+            },
+            {
+              "element": "OrdNo",
+              "name": "주문번호",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "BrnNm",
+              "name": "지점명",
+              "type": "String",
+              "length": "40"
+            },
+            {
+              "element": "AcntNm",
+              "name": "계좌명",
+              "type": "String",
+              "length": "40"
+            },
+            {
+              "element": "IsuNm",
+              "name": "종목명",
+              "type": "String",
+              "length": "50"
+            },
+            {
+              "element": "OrdAbleAmt",
+              "name": "주문가능금액",
+              "type": "Number",
+              "length": "16"
+            },
+            {
+              "element": "MnyOrdAbleAmt",
+              "name": "현금주문가능금액",
+              "type": "Number",
+              "length": "16"
+            },
+            {
+              "element": "OrdMgn",
+              "name": "주문증거금액",
+              "type": "Number",
+              "length": "16"
+            },
+            {
+              "element": "MnyOrdMgn",
+              "name": "현금주문증거금액",
+              "type": "Number",
+              "length": "16"
+            },
+            {
+              "element": "OrdAbleQty",
+              "name": "주문가능수량",
+              "type": "Number",
+              "length": "16"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "t8465": {
+    "path": "/futureoption/chart",
+    "req": {
+      "headers": [
+        {
+          "element": "content-type",
+          "name": "컨텐츠타입",
+          "type": "String",
+          "length": "100",
+          "description": "LS증권 제공 API를 호출하기 위한 Request Body 데이터 포맷으로 \"application/json; charset=utf-8 설정\""
+        },
+        {
+          "element": "authorization",
+          "name": "접근토큰",
+          "type": "String",
+          "length": "1000",
+          "description": "OAuth 토큰이 필요한 API 경우 발급한 Access Token을 설정하기 위한 Request Heaeder Parameter"
+        },
+        {
+          "element": "tr_cd",
+          "name": "거래 CD",
+          "type": "String",
+          "length": "10",
+          "description": "LS증권 거래코드"
+        },
+        {
+          "element": "tr_cont",
+          "name": "연속 거래 여부",
+          "type": "String",
+          "length": "1",
+          "description": "연속거래 여부\r\nY:연속○\r\nN:연속×"
+        },
+        {
+          "element": "tr_cont_key",
+          "name": "연속 거래 Key",
+          "type": "String",
+          "length": "18",
+          "description": "연속일 경우 그전에 내려온 연속키 값 올림"
+        },
+        {
+          "element": "mac_address",
+          "name": "MAC 주소",
+          "type": "String",
+          "length": "12",
+          "description": "법인인 경우 필수 세팅"
+        }
+      ],
+      "body": [
+        {
+          "element": "t8465InBlock",
+          "name": "t8465InBlock",
+          "type": "Object",
+          "fields": [
+            {
+              "element": "shcode",
+              "name": "단축코드",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "ncnt",
+              "name": "단위(n분)",
+              "type": "Number",
+              "length": "4",
+              "description": "0:30초\r\n1: 1분\r\n2: 2분\r\n.....\r\nn: n분"
+            },
+            {
+              "element": "qrycnt",
+              "name": "요청건수(최대-압축:2000비압축:500)",
+              "type": "Number",
+              "length": "4",
+              "description": "요청건수\r\n\r\n압축모듈인 경우 최대 2000건까지 조회가능.\r\n비압축인 경우 최대 500건까지 조회가능"
+            },
+            {
+              "element": "nday",
+              "name": "조회영업일수(0:미사용1>=사용)",
+              "type": "String",
+              "length": "1",
+              "description": "0:미사용"
+            },
+            {
+              "element": "sdate",
+              "name": "시작일자",
+              "type": "String",
+              "length": "8",
+              "description": "기본값 : Space\r\n(edate(필수입력) 기준으로 qrycnt 만큼 조회)\r\n\r\n조회구간을 설정하여 필터링 하고 싶은 경우 입력"
+            },
+            {
+              "element": "stime",
+              "name": "시작시간(현재미사용)",
+              "type": "String",
+              "length": "6"
+            },
+            {
+              "element": "edate",
+              "name": "종료일자",
+              "type": "String",
+              "length": "8",
+              "description": "처음조회기준일(LE)\r\n처음조회일 경우 이 값 기준으로 조회\r\n(\"99999999\" 혹은 '당일')"
+            },
+            {
+              "element": "etime",
+              "name": "종료시간(현재미사용)",
+              "type": "String",
+              "length": "6"
+            },
+            {
+              "element": "cts_date",
+              "name": "연속일자",
+              "type": "String",
+              "length": "8",
+              "description": "처음 조회시는 Space\r\n연속 조회시에 이전 조회한 OutBlock의 cts_date 값으로 설정"
+            },
+            {
+              "element": "cts_time",
+              "name": "연속시간",
+              "type": "String",
+              "length": "10"
+            },
+            {
+              "element": "comp_yn",
+              "name": "압축여부(Y:압축N:비압축)",
+              "type": "String",
+              "length": "1",
+              "description": "N:비압축 모듈\r\nY: 압 축 모듈"
+            }
+          ]
+        }
+      ]
+    },
+    "resp": {
+      "headers": [
+        {
+          "element": "content-type",
+          "name": "컨텐츠타입",
+          "type": "String",
+          "length": "100",
+          "description": "LS증권 제공 API를 호출하기 위한 Request Body 데이터 포맷으로 \"application/json; charset=utf-8 설정\""
+        },
+        {
+          "element": "tr_cd",
+          "name": "거래 CD",
+          "type": "String",
+          "length": "10",
+          "description": "LS증권 거래코드"
+        },
+        {
+          "element": "tr_cont",
+          "name": "연속 거래 여부",
+          "type": "String",
+          "length": "1",
+          "description": "연속거래 여부\r\nY:연속○\r\nN:연속×"
+        },
+        {
+          "element": "tr_cont_key",
+          "name": "연속 거래 Key",
+          "type": "String",
+          "length": "18",
+          "description": "연속일 경우 그전에 내려온 연속키 값 올림"
+        }
+      ],
+      "body": [
+        {
+          "element": "t8465OutBlock",
+          "name": "t8465OutBlock",
+          "type": "Object",
+          "fields": [
+            {
+              "element": "shcode",
+              "name": "단축코드",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "jisiga",
+              "name": "전일시가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "jihigh",
+              "name": "전일고가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "jilow",
+              "name": "전일저가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "jiclose",
+              "name": "전일종가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "jivolume",
+              "name": "전일거래량",
+              "type": "Number",
+              "length": "12"
+            },
+            {
+              "element": "disiga",
+              "name": "당일시가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "dihigh",
+              "name": "당일고가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "dilow",
+              "name": "당일저가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "diclose",
+              "name": "당일종가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "highend",
+              "name": "상한가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "lowend",
+              "name": "하한가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "cts_date",
+              "name": "연속일자",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "cts_time",
+              "name": "연속시간",
+              "type": "String",
+              "length": "10"
+            },
+            {
+              "element": "s_time",
+              "name": "장시작시간(HHMMSS)",
+              "type": "String",
+              "length": "6"
+            },
+            {
+              "element": "e_time",
+              "name": "장종료시간(HHMMSS)",
+              "type": "String",
+              "length": "6"
+            },
+            {
+              "element": "dshmin",
+              "name": "동시호가처리시간(MM:분)",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "rec_count",
+              "name": "레코드카운트",
+              "type": "Number",
+              "length": "7"
+            }
+          ]
+        },
+        {
+          "element": "t8465OutBlock1",
+          "name": "t8465OutBlock1",
+          "type": "Object Array",
+          "fields": [
+            {
+              "element": "date",
+              "name": "날짜",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "time",
+              "name": "시간",
+              "type": "String",
+              "length": "10"
+            },
+            {
+              "element": "open",
+              "name": "시가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "high",
+              "name": "고가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "low",
+              "name": "저가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "close",
+              "name": "종가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "jdiff_vol",
+              "name": "누적거래량",
+              "type": "Number",
+              "length": "12"
+            },
+            {
+              "element": "value",
+              "name": "거래대금",
+              "type": "Number",
+              "length": "12"
+            },
+            {
+              "element": "openyak",
+              "name": "미결제약정",
+              "type": "Number",
+              "length": "12"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "t8466": {
+    "path": "/futureoption/chart",
+    "req": {
+      "headers": [
+        {
+          "element": "content-type",
+          "name": "컨텐츠타입",
+          "type": "String",
+          "length": "100",
+          "description": "LS증권 제공 API를 호출하기 위한 Request Body 데이터 포맷으로 \"application/json; charset=utf-8 설정\""
+        },
+        {
+          "element": "authorization",
+          "name": "접근토큰",
+          "type": "String",
+          "length": "1000",
+          "description": "OAuth 토큰이 필요한 API 경우 발급한 Access Token을 설정하기 위한 Request Heaeder Parameter"
+        },
+        {
+          "element": "tr_cd",
+          "name": "거래 CD",
+          "type": "String",
+          "length": "10",
+          "description": "LS증권 거래코드"
+        },
+        {
+          "element": "tr_cont",
+          "name": "연속 거래 여부",
+          "type": "String",
+          "length": "1",
+          "description": "연속거래 여부\r\nY:연속○\r\nN:연속×"
+        },
+        {
+          "element": "tr_cont_key",
+          "name": "연속 거래 Key",
+          "type": "String",
+          "length": "18",
+          "description": "연속일 경우 그전에 내려온 연속키 값 올림"
+        },
+        {
+          "element": "mac_address",
+          "name": "MAC 주소",
+          "type": "String",
+          "length": "12",
+          "description": "법인인 경우 필수 세팅"
+        }
+      ],
+      "body": [
+        {
+          "element": "t8466InBlock",
+          "name": "t8466InBlock",
+          "type": "Object",
+          "fields": [
+            {
+              "element": "shcode",
+              "name": "단축코드",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "gubun",
+              "name": "주기구분(2:일3:주4:월)",
+              "type": "String",
+              "length": "1"
+            },
+            {
+              "element": "qrycnt",
+              "name": "요청건수(최대-압축:2000비압축:500)",
+              "type": "Number",
+              "length": "4",
+              "description": "요청건수\r\n\r\n압축모듈인 경우 최대 2000건까지 조회가능.\r\n비압축인 경우 최대 500건까지 조회가능"
+            },
+            {
+              "element": "sdate",
+              "name": "시작일자",
+              "type": "String",
+              "length": "8",
+              "description": "기본값 : Space\r\n(edate(필수입력) 기준으로 qrycnt 만큼 조회)\r\n\r\n조회구간을 설정하여 필터링 하고 싶은 경우 입력"
+            },
+            {
+              "element": "edate",
+              "name": "종료일자",
+              "type": "String",
+              "length": "8",
+              "description": "처음조회기준일(LE)\r\n처음조회일 경우 이 값 기준으로 조회\r\n(\"99999999\" 혹은 '당일')"
+            },
+            {
+              "element": "cts_date",
+              "name": "연속일자",
+              "type": "String",
+              "length": "8",
+              "description": "처음 조회시는 Space\r\n연속 조회시에 이전 조회한 OutBlock의 cts_date 값으로 설정"
+            },
+            {
+              "element": "comp_yn",
+              "name": "압축여부(Y:압축N:비압축)",
+              "type": "String",
+              "length": "1",
+              "description": "N:비압축 모듈\r\nY: 압 축 모듈"
+            }
+          ]
+        }
+      ]
+    },
+    "resp": {
+      "headers": [
+        {
+          "element": "content-type",
+          "name": "컨텐츠타입",
+          "type": "String",
+          "length": "100",
+          "description": "LS증권 제공 API를 호출하기 위한 Request Body 데이터 포맷으로 \"application/json; charset=utf-8 설정\""
+        },
+        {
+          "element": "tr_cd",
+          "name": "거래 CD",
+          "type": "String",
+          "length": "10",
+          "description": "LS증권 거래코드"
+        },
+        {
+          "element": "tr_cont",
+          "name": "연속 거래 여부",
+          "type": "String",
+          "length": "1",
+          "description": "연속거래 여부\r\nY:연속○\r\nN:연속×"
+        },
+        {
+          "element": "tr_cont_key",
+          "name": "연속 거래 Key",
+          "type": "String",
+          "length": "18",
+          "description": "연속일 경우 그전에 내려온 연속키 값 올림"
+        }
+      ],
+      "body": [
+        {
+          "element": "t8466OutBlock",
+          "name": "t8466OutBlock",
+          "type": "Object",
+          "fields": [
+            {
+              "element": "shcode",
+              "name": "단축코드",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "jisiga",
+              "name": "전일시가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "jihigh",
+              "name": "전일고가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "jilow",
+              "name": "전일저가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "jiclose",
+              "name": "전일종가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "jivolume",
+              "name": "전일거래량",
+              "type": "Number",
+              "length": "12"
+            },
+            {
+              "element": "disiga",
+              "name": "당일시가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "dihigh",
+              "name": "당일고가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "dilow",
+              "name": "당일저가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "diclose",
+              "name": "당일종가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "highend",
+              "name": "상한가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "lowend",
+              "name": "하한가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "cts_date",
+              "name": "연속일자",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "s_time",
+              "name": "장시작시간(HHMMSS)",
+              "type": "String",
+              "length": "6"
+            },
+            {
+              "element": "e_time",
+              "name": "장종료시간(HHMMSS)",
+              "type": "String",
+              "length": "6"
+            },
+            {
+              "element": "dshmin",
+              "name": "동시호가처리시간(MM:분)",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "rec_count",
+              "name": "레코드카운트",
+              "type": "Number",
+              "length": "7"
+            }
+          ]
+        },
+        {
+          "element": "t8466OutBlock1",
+          "name": "t8466OutBlock1",
+          "type": "Object Array",
+          "fields": [
+            {
+              "element": "date",
+              "name": "날짜",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "open",
+              "name": "시가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "high",
+              "name": "고가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "low",
+              "name": "저가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "close",
+              "name": "종가",
+              "type": "Number",
+              "length": "9.2"
+            },
+            {
+              "element": "jdiff_vol",
+              "name": "누적거래량",
+              "type": "Number",
+              "length": "12"
+            },
+            {
+              "element": "value",
+              "name": "거래대금",
+              "type": "Number",
+              "length": "12"
+            },
+            {
+              "element": "openyak",
+              "name": "미결제약정",
+              "type": "Number",
+              "length": "12"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "COSAQ00102": {
+    "path": "/overseas-stock/accno",
+    "req": {
+      "body": [
+        {
+          "element": "COSAQ00102InBlock1",
+          "name": "COSAQ00102InBlock1",
+          "type": "Object",
+          "fields": [
+            {
+              "element": "RecCnt",
+              "name": "레코드갯수",
+              "type": "Number",
+              "length": "5",
+              "description": "00001"
+            },
+            {
+              "element": "QryTpCode",
+              "name": "조회구분코드",
+              "type": "String",
+              "length": "1",
+              "description": "1@계좌별"
+            },
+            {
+              "element": "BkseqTpCode",
+              "name": "역순구분코드",
+              "type": "String",
+              "length": "1",
+              "description": "1@역순\n2@정순"
+            },
+            {
+              "element": "OrdMktCode",
+              "name": "주문시장코드",
+              "type": "String",
+              "length": "2",
+              "description": "81@뉴욕거래소\n82@NASDAQ"
+            },
+            {
+              "element": "BnsTpCode",
+              "name": "매매구분코드",
+              "type": "String",
+              "length": "1",
+              "description": "0@전체\n1@매도\n2@매수"
+            },
+            {
+              "element": "IsuNo",
+              "name": "종목번호",
+              "type": "String",
+              "length": "12"
+            },
+            {
+              "element": "SrtOrdNo",
+              "name": "시작주문번호",
+              "type": "Number",
+              "length": "10",
+              "description": "역순인경우 999999999\n정순인 경우 0"
+            },
+            {
+              "element": "OrdDt",
+              "name": "주문일자",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "ExecYn",
+              "name": "체결여부",
+              "type": "String",
+              "length": "1",
+              "description": "0@전체\n1@체결\n2@미체결"
+            },
+            {
+              "element": "CrcyCode",
+              "name": "통화코드",
+              "type": "String",
+              "length": "3",
+              "description": "000@전체\nUSD@미국"
+            },
+            {
+              "element": "ThdayBnsAppYn",
+              "name": "당일매매적용여부",
+              "type": "String",
+              "length": "1",
+              "description": "0@미적용\n1@적용"
+            },
+            {
+              "element": "LoanBalHldYn",
+              "name": "대출잔고보유여부",
+              "type": "String",
+              "length": "1",
+              "description": "0@ 전체\n1@ 대출잔고만"
+            }
+          ]
+        }
+      ]
+    },
+    "resp": {
+      "body": [
+        {
+          "element": "COSAQ00102OutBlock1",
+          "name": "COSAQ00102OutBlock1",
+          "type": "Object",
+          "fields": [
+            {
+              "element": "RecCnt",
+              "name": "레코드갯수",
+              "type": "Number",
+              "length": "5"
+            },
+            {
+              "element": "QryTpCode",
+              "name": "조회구분코드",
+              "type": "String",
+              "length": "1"
+            },
+            {
+              "element": "BkseqTpCode",
+              "name": "역순구분코드",
+              "type": "String",
+              "length": "1"
+            },
+            {
+              "element": "OrdMktCode",
+              "name": "주문시장코드",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "AcntNo",
+              "name": "계좌번호",
+              "type": "String",
+              "length": "20"
+            },
+            {
+              "element": "Pwd",
+              "name": "비밀번호",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "BnsTpCode",
+              "name": "매매구분코드",
+              "type": "String",
+              "length": "1"
+            },
+            {
+              "element": "IsuNo",
+              "name": "종목번호",
+              "type": "String",
+              "length": "12"
+            },
+            {
+              "element": "SrtOrdNo",
+              "name": "시작주문번호",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "OrdDt",
+              "name": "주문일자",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "ExecYn",
+              "name": "체결여부",
+              "type": "String",
+              "length": "1"
+            },
+            {
+              "element": "CrcyCode",
+              "name": "통화코드",
+              "type": "String",
+              "length": "3"
+            },
+            {
+              "element": "ThdayBnsAppYn",
+              "name": "당일매매적용여부",
+              "type": "String",
+              "length": "1"
+            },
+            {
+              "element": "LoanBalHldYn",
+              "name": "대출잔고보유여부",
+              "type": "String",
+              "length": "1"
+            }
+          ]
+        },
+        {
+          "element": "COSAQ00102OutBlock2",
+          "name": "COSAQ00102OutBlock2",
+          "type": "Object",
+          "fields": [
+            {
+              "element": "RecCnt",
+              "name": "레코드갯수",
+              "type": "Number",
+              "length": "5"
+            },
+            {
+              "element": "AcntNm",
+              "name": "계좌명",
+              "type": "String",
+              "length": "40"
+            },
+            {
+              "element": "JpnMktHanglIsuNm",
+              "name": "일본시장한글종목명",
+              "type": "String",
+              "length": "100"
+            },
+            {
+              "element": "MgmtBrnNm",
+              "name": "관리지점명",
+              "type": "String",
+              "length": "40"
+            },
+            {
+              "element": "SellExecFcurrAmt",
+              "name": "매도체결외화금액",
+              "type": "Number",
+              "length": "21.4"
+            },
+            {
+              "element": "SellExecQty",
+              "name": "매도체결수량",
+              "type": "Number",
+              "length": "16"
+            },
+            {
+              "element": "BuyExecFcurrAmt",
+              "name": "매수체결외화금액",
+              "type": "Number",
+              "length": "21.4"
+            },
+            {
+              "element": "BuyExecQty",
+              "name": "매수체결수량",
+              "type": "Number",
+              "length": "16"
+            }
+          ]
+        },
+        {
+          "element": "COSAQ00102OutBlock3",
+          "name": "COSAQ00102OutBlock3",
+          "type": "Object",
+          "fields": [
+            {
+              "element": "MgmtBrnNo",
+              "name": "관리지점번호",
+              "type": "String",
+              "length": "3"
+            },
+            {
+              "element": "AcntNo",
+              "name": "계좌번호",
+              "type": "String",
+              "length": "20"
+            },
+            {
+              "element": "AcntNm",
+              "name": "계좌명",
+              "type": "String",
+              "length": "40"
+            },
+            {
+              "element": "ExecTime",
+              "name": "체결시각",
+              "type": "String",
+              "length": "9"
+            },
+            {
+              "element": "OrdTime",
+              "name": "주문시각",
+              "type": "String",
+              "length": "9"
+            },
+            {
+              "element": "OrdNo",
+              "name": "주문번호",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "OrgOrdNo",
+              "name": "원주문번호",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "ShtnIsuNo",
+              "name": "단축종목번호",
+              "type": "String",
+              "length": "9"
+            },
+            {
+              "element": "OrdTrxPtnNm",
+              "name": "주문처리유형명",
+              "type": "String",
+              "length": "50"
+            },
+            {
+              "element": "OrdTrxPtnCode",
+              "name": "주문처리유형코드",
+              "type": "Number",
+              "length": "9"
+            },
+            {
+              "element": "MrcAbleQty",
+              "name": "정정취소가능수량",
+              "type": "Number",
+              "length": "16"
+            },
+            {
+              "element": "OrdQty",
+              "name": "주문수량",
+              "type": "Number",
+              "length": "16"
+            },
+            {
+              "element": "OvrsOrdPrc",
+              "name": "해외주문가",
+              "type": "Number",
+              "length": "22.7"
+            },
+            {
+              "element": "ExecQty",
+              "name": "체결수량",
+              "type": "Number",
+              "length": "16"
+            },
+            {
+              "element": "OvrsExecPrc",
+              "name": "해외체결가",
+              "type": "Number",
+              "length": "28.7"
+            },
+            {
+              "element": "OrdprcPtnCode",
+              "name": "호가유형코드",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "OrdprcPtnNm",
+              "name": "호가유형명",
+              "type": "String",
+              "length": "40"
+            },
+            {
+              "element": "OrdPtnNm",
+              "name": "주문유형명",
+              "type": "String",
+              "length": "40"
+            },
+            {
+              "element": "OrdPtnCode",
+              "name": "주문유형코드",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "MrcTpCode",
+              "name": "정정취소구분코드",
+              "type": "String",
+              "length": "1"
+            },
+            {
+              "element": "MrcTpNm",
+              "name": "정정취소구분명",
+              "type": "String",
+              "length": "10"
+            },
+            {
+              "element": "AllExecQty",
+              "name": "전체체결수량",
+              "type": "Number",
+              "length": "16"
+            },
+            {
+              "element": "CommdaCode",
+              "name": "통신매체코드",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "OrdMktCode",
+              "name": "주문시장코드",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "MktNm",
+              "name": "시장명",
+              "type": "String",
+              "length": "40"
+            },
+            {
+              "element": "CommdaNm",
+              "name": "통신매체명",
+              "type": "String",
+              "length": "40"
+            },
+            {
+              "element": "JpnMktHanglIsuNm",
+              "name": "일본시장한글종목명",
+              "type": "String",
+              "length": "100"
+            },
+            {
+              "element": "UnercQty",
+              "name": "미체결수량",
+              "type": "Number",
+              "length": "16"
+            },
+            {
+              "element": "CnfQty",
+              "name": "확인수량",
+              "type": "Number",
+              "length": "16"
+            },
+            {
+              "element": "CrcyCode",
+              "name": "통화코드",
+              "type": "String",
+              "length": "3"
+            },
+            {
+              "element": "RegMktCode",
+              "name": "등록시장코드",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "IsuNo",
+              "name": "종목번호",
+              "type": "String",
+              "length": "12"
+            },
+            {
+              "element": "BrkTpCode",
+              "name": "중개인구분코드",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "OppBrkNm",
+              "name": "상대중개인명",
+              "type": "String",
+              "length": "40"
+            },
+            {
+              "element": "BnsTpCode",
+              "name": "매매구분코드",
+              "type": "String",
+              "length": "1"
+            },
+            {
+              "element": "LoanDt",
+              "name": "대출일자",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "LoanAmt",
+              "name": "대출금액",
+              "type": "Number",
+              "length": "16"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "g3106": {
+    "path": "/overseas-stock/market-data",
+    "req": {
+      "headers": [
+        {
+          "element": "content-type",
+          "name": "컨텐츠타입",
+          "type": "String",
+          "length": "100",
+          "description": "LS증권 제공 API를 호출하기 위한 Request Body 데이터 포맷으로 \"application/json; charset=utf-8 설정\""
+        },
+        {
+          "element": "authorization",
+          "name": "접근토큰",
+          "type": "String",
+          "length": "1000",
+          "description": "OAuth토큰이필요한API경우발급한AccessToken을설정하기위한RequestHeaederParameter"
+        },
+        {
+          "element": "tr_cd",
+          "name": "거래CD",
+          "type": "String",
+          "length": "10",
+          "description": "LS증권거래코드"
+        },
+        {
+          "element": "tr_cont",
+          "name": "연속거래여부",
+          "type": "String",
+          "length": "1",
+          "description": "연속거래여부Y:연속○N:연속×"
+        },
+        {
+          "element": "tr_cont_key",
+          "name": "연속거래Key",
+          "type": "String",
+          "length": "18",
+          "description": "연속일경우그전에내려온연속키값올림"
+        },
+        {
+          "element": "mac_address",
+          "name": "MAC주소",
+          "type": "String",
+          "length": "12",
+          "description": "법인인경우필수세팅"
+        }
+      ],
+      "body": [
+        {
+          "element": "g3106InBlock",
+          "name": "g3106InBlock",
+          "type": "Object",
+          "fields": [
+            {
+              "element": "delaygb",
+              "name": "지연구분",
+              "type": "String",
+              "length": "1"
+            },
+            {
+              "element": "keysymbol",
+              "name": "KEY종목코드",
+              "type": "String",
+              "length": "18"
+            },
+            {
+              "element": "exchcd",
+              "name": "거래소코드",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "symbol",
+              "name": "종목코드",
+              "type": "String",
+              "length": "16"
+            }
+          ]
+        }
+      ]
+    },
+    "resp": {
+      "headers": [
+        {
+          "element": "content-type",
+          "name": "컨텐츠타입",
+          "type": "String",
+          "length": "100",
+          "description": "LS증권 제공 API를 호출하기 위한 Request Body 데이터 포맷으로 \"application/json; charset=utf-8 설정\""
+        },
+        {
+          "element": "tr_cd",
+          "name": "거래CD",
+          "type": "String",
+          "length": "10",
+          "description": "LS증권거래코드"
+        },
+        {
+          "element": "tr_cont",
+          "name": "연속거래여부",
+          "type": "String",
+          "length": "1",
+          "description": "연속거래여부Y:연속○N:연속×"
+        },
+        {
+          "element": "tr_cont_key",
+          "name": "연속거래Key",
+          "type": "String",
+          "length": "18",
+          "description": "연속일경우그전에내려온연속키값올림"
+        }
+      ],
+      "body": [
+        {
+          "element": "g3106OutBlock",
+          "name": "g3106OutBlock",
+          "type": "Object",
+          "fields": [
+            {
+              "element": "delaygb",
+              "name": "지연구분",
+              "type": "String",
+              "length": "1"
+            },
+            {
+              "element": "keysymbol",
+              "name": "KEY종목코드",
+              "type": "String",
+              "length": "18"
+            },
+            {
+              "element": "exchcd",
+              "name": "거래소코드",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "symbol",
+              "name": "종목코드",
+              "type": "String",
+              "length": "16"
+            },
+            {
+              "element": "korname",
+              "name": "한글종목명",
+              "type": "String",
+              "length": "64"
+            },
+            {
+              "element": "price",
+              "name": "현재가",
+              "type": "Number",
+              "length": "15.6"
+            },
+            {
+              "element": "floatpoint",
+              "name": "소숫점자릿수",
+              "type": "String",
+              "length": "1"
+            },
+            {
+              "element": "sign",
+              "name": "전일대비구분",
+              "type": "String",
+              "length": "1"
+            },
+            {
+              "element": "diff",
+              "name": "전일대비",
+              "type": "Number",
+              "length": "15.6"
+            },
+            {
+              "element": "rate",
+              "name": "등락률",
+              "type": "Number",
+              "length": "6.2"
+            },
+            {
+              "element": "volume",
+              "name": "누적거래량",
+              "type": "Number",
+              "length": "16"
+            },
+            {
+              "element": "amount",
+              "name": "누적거래대금",
+              "type": "Number",
+              "length": "15"
+            },
+            {
+              "element": "jnilclose",
+              "name": "전일종가",
+              "type": "Number",
+              "length": "15.6"
+            },
+            {
+              "element": "open",
+              "name": "시가",
+              "type": "Number",
+              "length": "15.6"
+            },
+            {
+              "element": "high",
+              "name": "고가",
+              "type": "Number",
+              "length": "15.6"
+            },
+            {
+              "element": "low",
+              "name": "저가",
+              "type": "Number",
+              "length": "15.6"
+            },
+            {
+              "element": "hotime",
+              "name": "호가수신시간",
+              "type": "String",
+              "length": "6"
+            },
+            {
+              "element": "offerho1",
+              "name": "매도호가1",
+              "type": "Number",
+              "length": "15.6"
+            },
+            {
+              "element": "bidho1",
+              "name": "매수호가1",
+              "type": "Number",
+              "length": "15.6"
+            },
+            {
+              "element": "offercnt1",
+              "name": "매도호가건수1",
+              "type": "String",
+              "length": "10"
+            },
+            {
+              "element": "bidcnt1",
+              "name": "매수호가건수1",
+              "type": "String",
+              "length": "10"
+            },
+            {
+              "element": "offerrem1",
+              "name": "매도호가잔량1",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "bidrem1",
+              "name": "매수호가잔량1",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "offerho2",
+              "name": "매도호가2",
+              "type": "Number",
+              "length": "15.6"
+            },
+            {
+              "element": "bidho2",
+              "name": "매수호가2",
+              "type": "Number",
+              "length": "15.6"
+            },
+            {
+              "element": "offercnt2",
+              "name": "매도호가건수2",
+              "type": "String",
+              "length": "10"
+            },
+            {
+              "element": "bidcnt2",
+              "name": "매수호가건수2",
+              "type": "String",
+              "length": "10"
+            },
+            {
+              "element": "offerrem2",
+              "name": "매도호가잔량2",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "bidrem2",
+              "name": "매수호가잔량2",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "offerho3",
+              "name": "매도호가3",
+              "type": "Number",
+              "length": "15.6"
+            },
+            {
+              "element": "bidho3",
+              "name": "매수호가3",
+              "type": "Number",
+              "length": "15.6"
+            },
+            {
+              "element": "offercnt3",
+              "name": "매도호가건수3",
+              "type": "String",
+              "length": "10"
+            },
+            {
+              "element": "bidcnt3",
+              "name": "매수호가건수3",
+              "type": "String",
+              "length": "10"
+            },
+            {
+              "element": "offerrem3",
+              "name": "매도호가잔량3",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "bidrem3",
+              "name": "매수호가잔량3",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "offerho4",
+              "name": "매도호가4",
+              "type": "Number",
+              "length": "15.6"
+            },
+            {
+              "element": "bidho4",
+              "name": "매수호가4",
+              "type": "Number",
+              "length": "15.6"
+            },
+            {
+              "element": "offercnt4",
+              "name": "매도호가건수4",
+              "type": "String",
+              "length": "10"
+            },
+            {
+              "element": "bidcnt4",
+              "name": "매수호가건수4",
+              "type": "String",
+              "length": "10"
+            },
+            {
+              "element": "offerrem4",
+              "name": "매도호가잔량4",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "bidrem4",
+              "name": "매수호가잔량4",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "offerho5",
+              "name": "매도호가5",
+              "type": "Number",
+              "length": "15.6"
+            },
+            {
+              "element": "bidho5",
+              "name": "매수호가5",
+              "type": "Number",
+              "length": "15.6"
+            },
+            {
+              "element": "offercnt5",
+              "name": "매도호가건수5",
+              "type": "String",
+              "length": "10"
+            },
+            {
+              "element": "bidcnt5",
+              "name": "매수호가건수5",
+              "type": "String",
+              "length": "10"
+            },
+            {
+              "element": "offerrem5",
+              "name": "매도호가잔량5",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "bidrem5",
+              "name": "매수호가잔량5",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "offerho6",
+              "name": "매도호가6",
+              "type": "Number",
+              "length": "15.6"
+            },
+            {
+              "element": "bidho6",
+              "name": "매수호가6",
+              "type": "Number",
+              "length": "15.6"
+            },
+            {
+              "element": "offercnt6",
+              "name": "매도호가건수6",
+              "type": "String",
+              "length": "10"
+            },
+            {
+              "element": "bidcnt6",
+              "name": "매수호가건수6",
+              "type": "String",
+              "length": "10"
+            },
+            {
+              "element": "offerrem6",
+              "name": "매도호가잔량6",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "bidrem6",
+              "name": "매수호가잔량6",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "offerho7",
+              "name": "매도호가7",
+              "type": "Number",
+              "length": "15.6"
+            },
+            {
+              "element": "bidho7",
+              "name": "매수호가7",
+              "type": "Number",
+              "length": "15.6"
+            },
+            {
+              "element": "offercnt7",
+              "name": "매도호가건수7",
+              "type": "String",
+              "length": "10"
+            },
+            {
+              "element": "bidcnt7",
+              "name": "매수호가건수7",
+              "type": "String",
+              "length": "10"
+            },
+            {
+              "element": "offerrem7",
+              "name": "매도호가잔량7",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "bidrem7",
+              "name": "매수호가잔량7",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "offerho8",
+              "name": "매도호가8",
+              "type": "Number",
+              "length": "15.6"
+            },
+            {
+              "element": "bidho8",
+              "name": "매수호가8",
+              "type": "Number",
+              "length": "15.6"
+            },
+            {
+              "element": "offercnt8",
+              "name": "매도호가건수8",
+              "type": "String",
+              "length": "10"
+            },
+            {
+              "element": "bidcnt8",
+              "name": "매수호가건수8",
+              "type": "String",
+              "length": "10"
+            },
+            {
+              "element": "offerrem8",
+              "name": "매도호가잔량8",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "bidrem8",
+              "name": "매수호가잔량8",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "offerho9",
+              "name": "매도호가9",
+              "type": "Number",
+              "length": "15.6"
+            },
+            {
+              "element": "bidho9",
+              "name": "매수호가9",
+              "type": "Number",
+              "length": "15.6"
+            },
+            {
+              "element": "offercnt9",
+              "name": "매도호가건수9",
+              "type": "String",
+              "length": "10"
+            },
+            {
+              "element": "bidcnt9",
+              "name": "매수호가건수9",
+              "type": "String",
+              "length": "10"
+            },
+            {
+              "element": "offerrem9",
+              "name": "매도호가잔량9",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "bidrem9",
+              "name": "매수호가잔량9",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "offerho10",
+              "name": "매도호가10",
+              "type": "Number",
+              "length": "15.6"
+            },
+            {
+              "element": "bidho10",
+              "name": "매수호가10",
+              "type": "Number",
+              "length": "15.6"
+            },
+            {
+              "element": "offercnt10",
+              "name": "매도호가건수10",
+              "type": "String",
+              "length": "10"
+            },
+            {
+              "element": "bidcnt10",
+              "name": "매수호가건수10",
+              "type": "String",
+              "length": "10"
+            },
+            {
+              "element": "offerrem10",
+              "name": "매도호가잔량10",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "bidrem10",
+              "name": "매수호가잔량10",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "offercnt",
+              "name": "매도호가건수합",
+              "type": "String",
+              "length": "10"
+            },
+            {
+              "element": "bidcnt",
+              "name": "매수호가건수합",
+              "type": "String",
+              "length": "10"
+            },
+            {
+              "element": "offer",
+              "name": "매도호가잔량합",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "bid",
+              "name": "매수호가잔량합",
+              "type": "Number",
+              "length": "10"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "g3112": {
+    "path": "/overseas-stock/market-data",
+    "req": {
+      "headers": [
+        {
+          "element": "content-type",
+          "name": "컨텐츠타입",
+          "type": "String",
+          "length": "100",
+          "description": "LS증권 제공 API를 호출하기 위한 Request Body 데이터 포맷으로 \"application/json; charset=utf-8 설정\""
+        },
+        {
+          "element": "authorization",
+          "name": "접근토큰",
+          "type": "String",
+          "length": "1000",
+          "description": "OAuth 토큰이 필요한 API 경우 발급한 Access Token을 설정하기 위한 Request Header Parameter"
+        },
+        {
+          "element": "tr_cd",
+          "name": "거래 CD",
+          "type": "String",
+          "length": "10",
+          "description": "LS증권 거래코드"
+        },
+        {
+          "element": "tr_cont",
+          "name": "연속 거래 여부",
+          "type": "String",
+          "length": "1",
+          "description": "연속거래 여부\nY:연속○\nN:연속×"
+        },
+        {
+          "element": "tr_cont_key",
+          "name": "연속 거래 Key",
+          "type": "String",
+          "length": "18",
+          "description": "연속일 경우 그전에 내려온 연속키 값 올림"
+        },
+        {
+          "element": "mac_address",
+          "name": "MAC 주소",
+          "type": "String",
+          "length": "12",
+          "description": "법인인 경우 필수 세팅"
+        }
+      ],
+      "body": [
+        {
+          "element": "g3112InBlock",
+          "name": "기본입력",
+          "type": "Object",
+          "fields": [
+            {
+              "element": "delaygb",
+              "name": "지연구분",
+              "type": "String",
+              "length": "1",
+              "description": "R"
+            },
+            {
+              "element": "natcode",
+              "name": "국가구분",
+              "type": "String",
+              "length": "2",
+              "description": "US : 미국"
+            },
+            {
+              "element": "exgubun",
+              "name": "거래소구분",
+              "type": "String",
+              "length": "1",
+              "description": "1 : 전체\n2 : 뉴욕\n3 : 나스닥\n4 : ETF"
+            },
+            {
+              "element": "rankgubun",
+              "name": "순위구분",
+              "type": "String",
+              "length": "1",
+              "description": "0 : 전일대비상승률\n1 : 전일대비하락률\n2 : 당일거래량\n3 : 거래대금\n4 : 회전율\n5 : 시가총액\n6 : 52주신고가\n7 : 52주신저가\n8 : 상한가\n9 : 하한가"
+            },
+            {
+              "element": "cts_value",
+              "name": "연속구분",
+              "type": "String",
+              "length": "16",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "resp": {
+      "headers": [
+        {
+          "element": "content-type",
+          "name": "컨텐츠타입",
+          "type": "String",
+          "length": "100",
+          "description": "LS증권 제공 API를 호출하기 위한 Request Body 데이터 포맷으로 \"application/json; charset=utf-8 설정\""
+        },
+        {
+          "element": "tr_cd",
+          "name": "거래 CD",
+          "type": "String",
+          "length": "10",
+          "description": "LS증권 거래코드"
+        },
+        {
+          "element": "tr_cont",
+          "name": "연속 거래 여부",
+          "type": "String",
+          "length": "1",
+          "description": "연속 거래 여부\nY:연속○\nN:연속×"
+        },
+        {
+          "element": "tr_cont_key",
+          "name": "연속 거래 Key",
+          "type": "String",
+          "length": "18",
+          "description": "연속일 경우 그전에 내려온 연속키 값 올림"
+        }
+      ],
+      "body": [
+        {
+          "element": "g3112OutBlock",
+          "name": "출력",
+          "type": "Object",
+          "fields": [
+            {
+              "element": "delaygb",
+              "name": "지연구분",
+              "type": "String",
+              "length": "1"
+            },
+            {
+              "element": "natcode",
+              "name": "국가구분",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "exgubun",
+              "name": "거래소구분",
+              "type": "String",
+              "length": "1"
+            },
+            {
+              "element": "rankgubun",
+              "name": "순위구분",
+              "type": "String",
+              "length": "1"
+            },
+            {
+              "element": "cts_value",
+              "name": "연속구분",
+              "type": "String",
+              "length": "16"
+            },
+            {
+              "element": "rec_count",
+              "name": "레코드카운트",
+              "type": "String",
+              "length": "7"
+            }
+          ]
+        },
+        {
+          "element": "g3112OutBlock1",
+          "name": "출력1",
+          "type": "Object Array",
+          "fields": [
+            {
+              "element": "keysymbol",
+              "name": "KEY종목코드",
+              "type": "String",
+              "length": "18"
+            },
+            {
+              "element": "exsymbol",
+              "name": "거래소종목명",
+              "type": "String",
+              "length": "32"
+            },
+            {
+              "element": "symbol",
+              "name": "종목코드",
+              "type": "String",
+              "length": "16"
+            },
+            {
+              "element": "korname",
+              "name": "한글종목명",
+              "type": "String",
+              "length": "64"
+            },
+            {
+              "element": "price",
+              "name": "현재가",
+              "type": "String",
+              "length": "15.6"
+            },
+            {
+              "element": "sign",
+              "name": "전일대비구분",
+              "type": "String",
+              "length": "1"
+            },
+            {
+              "element": "diff",
+              "name": "전일대비",
+              "type": "String",
+              "length": "15.6"
+            },
+            {
+              "element": "rate",
+              "name": "등락률",
+              "type": "String",
+              "length": "6.2"
+            },
+            {
+              "element": "volume",
+              "name": "거래량",
+              "type": "String",
+              "length": "16"
+            },
+            {
+              "element": "amount",
+              "name": "거래대금",
+              "type": "String",
+              "length": "16"
+            },
+            {
+              "element": "trgt",
+              "name": "회전율",
+              "type": "String",
+              "length": "15.6"
+            },
+            {
+              "element": "shareprc",
+              "name": "시가총액",
+              "type": "String",
+              "length": "16"
+            },
+            {
+              "element": "high52p",
+              "name": "52주최고가",
+              "type": "String",
+              "length": "15.6"
+            },
+            {
+              "element": "low52p",
+              "name": "52주최저가",
+              "type": "String",
+              "length": "15.6"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "COSAT00301": {
+    "path": "/overseas-stock/order",
+    "req": {
+      "body": [
+        {
+          "element": "COSAT00301InBlock1",
+          "name": "COSAT00301InBlock1",
+          "type": "Object",
+          "fields": [
+            {
+              "element": "RecCnt",
+              "name": "레코드갯수",
+              "type": "Number",
+              "length": "5",
+              "description": "00001"
+            },
+            {
+              "element": "OrdPtnCode",
+              "name": "주문유형코드",
+              "type": "String",
+              "length": "2",
+              "description": "01 : 매도주문\n02 : 매수주문\n08 : 취소주문"
+            },
+            {
+              "element": "OrgOrdNo",
+              "name": "원주문번호",
+              "type": "Number",
+              "length": "10",
+              "required": false,
+              "description": "취소주문인 경우만 필수 입력"
+            },
+            {
+              "element": "OrdMktCode",
+              "name": "주문시장코드",
+              "type": "String",
+              "length": "2",
+              "description": "81 : 뉴욕거래소\n82 : NASDAQ"
+            },
+            {
+              "element": "IsuNo",
+              "name": "종목번호",
+              "type": "String",
+              "length": "12",
+              "description": "단축종목코드\nex.TSLA"
+            },
+            {
+              "element": "OrdQty",
+              "name": "주문수량",
+              "type": "Number",
+              "length": "16"
+            },
+            {
+              "element": "OvrsOrdPrc",
+              "name": "해외주문가",
+              "type": "Number",
+              "length": "28.7"
+            },
+            {
+              "element": "OrdprcPtnCode",
+              "name": "호가유형코드",
+              "type": "String",
+              "length": "2",
+              "description": "00@지정가\nM1@LOO\nM2@LOC\n\n매도인경우 호가유형 확대\n03@시장가\nM3@MOO\nM4@MOC"
+            },
+            {
+              "element": "BrkTpCode",
+              "name": "중개인구분코드",
+              "type": "String",
+              "length": "2"
+            }
+          ]
+        }
+      ]
+    },
+    "resp": {
+      "body": [
+        {
+          "element": "COSAT00301OutBlock1",
+          "name": "COSAT00301OutBlock1",
+          "type": "Object",
+          "fields": [
+            {
+              "element": "RecCnt",
+              "name": "레코드갯수",
+              "type": "Number",
+              "length": "5"
+            },
+            {
+              "element": "OrdPtnCode",
+              "name": "주문유형코드",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "OrgOrdNo",
+              "name": "원주문번호",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "AcntNo",
+              "name": "계좌번호",
+              "type": "String",
+              "length": "20"
+            },
+            {
+              "element": "InptPwd",
+              "name": "입력비밀번호",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "OrdMktCode",
+              "name": "주문시장코드",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "IsuNo",
+              "name": "종목번호",
+              "type": "String",
+              "length": "12"
+            },
+            {
+              "element": "OrdQty",
+              "name": "주문수량",
+              "type": "Number",
+              "length": "16"
+            },
+            {
+              "element": "OvrsOrdPrc",
+              "name": "해외주문가",
+              "type": "Number",
+              "length": "28.7"
+            },
+            {
+              "element": "OrdprcPtnCode",
+              "name": "호가유형코드",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "RegCommdaCode",
+              "name": "등록통신매체코드",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "BrkTpCode",
+              "name": "중개인구분코드",
+              "type": "String",
+              "length": "2"
+            }
+          ]
+        },
+        {
+          "element": "COSAT00301OutBlock2",
+          "name": "COSAT00301OutBlock2",
+          "type": "Object",
+          "fields": [
+            {
+              "element": "RecCnt",
+              "name": "레코드갯수",
+              "type": "Number",
+              "length": "5"
+            },
+            {
+              "element": "OrdNo",
+              "name": "주문번호",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "AcntNm",
+              "name": "계좌명",
+              "type": "String",
+              "length": "40"
+            },
+            {
+              "element": "IsuNm",
+              "name": "종목명",
+              "type": "String",
+              "length": "40"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "COSAT00400": {
+    "path": "/overseas-stock/order",
+    "req": {
+      "body": [
+        {
+          "element": "COSAT00400InBlock1",
+          "name": "COSAT00400InBlock1",
+          "type": "Object",
+          "fields": [
+            {
+              "element": "RecCnt",
+              "name": "레코드갯수",
+              "type": "Number",
+              "length": "5"
+            },
+            {
+              "element": "TrxTpCode",
+              "name": "처리구분코드",
+              "type": "String",
+              "length": "1",
+              "description": "0 : 등록 \r\n2 : 취소"
+            },
+            {
+              "element": "CntryCode",
+              "name": "국가코드",
+              "type": "String",
+              "length": "3"
+            },
+            {
+              "element": "RsvOrdInptDt",
+              "name": "예약주문입력일자",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "RsvOrdNo",
+              "name": "예약주문번호",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "BnsTpCode",
+              "name": "매매구분코드",
+              "type": "String",
+              "length": "1"
+            },
+            {
+              "element": "AcntNo",
+              "name": "계좌번호",
+              "type": "String",
+              "length": "20"
+            },
+            {
+              "element": "Pwd",
+              "name": "비밀번호",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "FcurrMktCode",
+              "name": "외화시장코드",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "IsuNo",
+              "name": "종목번호",
+              "type": "String",
+              "length": "12"
+            },
+            {
+              "element": "OrdQty",
+              "name": "주문수량",
+              "type": "Number",
+              "length": "16"
+            },
+            {
+              "element": "OvrsOrdPrc",
+              "name": "해외주문가",
+              "type": "Number",
+              "length": "28.7"
+            },
+            {
+              "element": "OrdprcPtnCode",
+              "name": "호가유형코드",
+              "type": "String",
+              "length": "2",
+              "description": "00 : 지정가\r\nA2 : TWAP\r\nA3 : VWAP"
+            },
+            {
+              "element": "RsvOrdSrtDt",
+              "name": "예약주문시작일자",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "RsvOrdEndDt",
+              "name": "예약주문종료일자",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "RsvOrdCndiCode",
+              "name": "예약주문조건코드",
+              "type": "String",
+              "length": "2",
+              "description": "00 : 일반예약주문\r\n01 : 동일조건 반복예약주문\r\n02 : 미체결수량 반복예약주문"
+            },
+            {
+              "element": "MgntrnCode",
+              "name": "신용거래코드",
+              "type": "String",
+              "length": "3"
+            },
+            {
+              "element": "LoanDt",
+              "name": "대출일자",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "LoanDtlClssCode",
+              "name": "대출상세분류코드",
+              "type": "String",
+              "length": "2"
+            }
+          ]
+        }
+      ]
+    },
+    "resp": {
+      "body": [
+        {
+          "element": "COSAT00400OutBlock1",
+          "name": "COSAT00400OutBlock1",
+          "type": "Object",
+          "fields": [
+            {
+              "element": "RecCnt",
+              "name": "레코드갯수",
+              "type": "Number",
+              "length": "5"
+            },
+            {
+              "element": "TrxTpCode",
+              "name": "처리구분코드",
+              "type": "String",
+              "length": "1"
+            },
+            {
+              "element": "CntryCode",
+              "name": "국가코드",
+              "type": "String",
+              "length": "3"
+            },
+            {
+              "element": "RsvOrdInptDt",
+              "name": "예약주문입력일자",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "RsvOrdNo",
+              "name": "예약주문번호",
+              "type": "Number",
+              "length": "10"
+            },
+            {
+              "element": "BnsTpCode",
+              "name": "매매구분코드",
+              "type": "String",
+              "length": "1"
+            },
+            {
+              "element": "AcntNo",
+              "name": "계좌번호",
+              "type": "String",
+              "length": "20"
+            },
+            {
+              "element": "Pwd",
+              "name": "비밀번호",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "FcurrMktCode",
+              "name": "외화시장코드",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "IsuNo",
+              "name": "종목번호",
+              "type": "String",
+              "length": "12"
+            },
+            {
+              "element": "OrdQty",
+              "name": "주문수량",
+              "type": "Number",
+              "length": "16"
+            },
+            {
+              "element": "OvrsOrdPrc",
+              "name": "해외주문가",
+              "type": "Number",
+              "length": "28.7"
+            },
+            {
+              "element": "RegCommdaCode",
+              "name": "등록통신매체코드",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "OrdprcPtnCode",
+              "name": "호가유형코드",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "RsvOrdSrtDt",
+              "name": "예약주문시작일자",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "RsvOrdEndDt",
+              "name": "예약주문종료일자",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "RsvOrdCndiCode",
+              "name": "예약주문조건코드",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "MgntrnCode",
+              "name": "신용거래코드",
+              "type": "String",
+              "length": "3"
+            },
+            {
+              "element": "LoanDt",
+              "name": "대출일자",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "LoanDtlClssCode",
+              "name": "대출상세분류코드",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "RecCnt",
+              "name": "레코드갯수",
+              "type": "Number",
+              "length": "5"
+            },
+            {
+              "element": "RsvOrdNo",
+              "name": "예약주문번호",
+              "type": "Number",
+              "length": "10"
+            }
+          ]
+        },
+        {
+          "element": "COSAT00400OutBlock2",
+          "name": "COSAT00400OutBlock2",
+          "type": "Object"
+        }
+      ]
+    }
+  },
+  "g3203": {
+    "path": "/overseas-stock/chart",
+    "req": {
+      "body": [
+        {
+          "element": "g3203InBlock",
+          "name": "g3203InBlock",
+          "type": "Object",
+          "fields": [
+            {
+              "element": "delaygb",
+              "name": "지연구분",
+              "type": "String",
+              "length": "1"
+            },
+            {
+              "element": "keysymbol",
+              "name": "KEY종목코드",
+              "type": "String",
+              "length": "18"
+            },
+            {
+              "element": "exchcd",
+              "name": "거래소코드",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "symbol",
+              "name": "종목코드",
+              "type": "String",
+              "length": "16"
+            },
+            {
+              "element": "ncnt",
+              "name": "단위(n분)",
+              "type": "Number",
+              "length": "4"
+            },
+            {
+              "element": "qrycnt",
+              "name": "요청건수(최대-압축:2000비압축:5",
+              "type": "Number",
+              "length": "4"
+            },
+            {
+              "element": "comp_yn",
+              "name": "압축여부(Y:압축N:비압축)",
+              "type": "String",
+              "length": "1"
+            },
+            {
+              "element": "sdate",
+              "name": "시작일자",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "edate",
+              "name": "종료일자",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "cts_date",
+              "name": "연속일자",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "cts_time",
+              "name": "연속시간",
+              "type": "String",
+              "length": "6"
+            }
+          ]
+        }
+      ]
+    },
+    "resp": {
+      "body": [
+        {
+          "element": "g3203OutBlock",
+          "name": "g3203OutBlock",
+          "type": "Object",
+          "fields": [
+            {
+              "element": "delaygb",
+              "name": "지연구분",
+              "type": "String",
+              "length": "1"
+            },
+            {
+              "element": "keysymbol",
+              "name": "KEY종목코드",
+              "type": "String",
+              "length": "18"
+            },
+            {
+              "element": "exchcd",
+              "name": "거래소코드",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "symbol",
+              "name": "종목코드",
+              "type": "String",
+              "length": "16"
+            },
+            {
+              "element": "cts_date",
+              "name": "연속일자",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "cts_time",
+              "name": "연속시간",
+              "type": "String",
+              "length": "6"
+            },
+            {
+              "element": "rec_count",
+              "name": "레코드카운트",
+              "type": "Number",
+              "length": "7"
+            },
+            {
+              "element": "preopen",
+              "name": "전일시가",
+              "type": "Number",
+              "length": "15.8"
+            },
+            {
+              "element": "prehigh",
+              "name": "전일고가",
+              "type": "Number",
+              "length": "15.8"
+            },
+            {
+              "element": "prelow",
+              "name": "전일저가",
+              "type": "Number",
+              "length": "15.8"
+            },
+            {
+              "element": "preclose",
+              "name": "전일종가",
+              "type": "Number",
+              "length": "15.8"
+            },
+            {
+              "element": "prevolume",
+              "name": "전일거래량",
+              "type": "Number",
+              "length": "16"
+            },
+            {
+              "element": "open",
+              "name": "당일시가",
+              "type": "Number",
+              "length": "15.8"
+            },
+            {
+              "element": "high",
+              "name": "당일고가",
+              "type": "Number",
+              "length": "15.8"
+            },
+            {
+              "element": "low",
+              "name": "당일저가",
+              "type": "Number",
+              "length": "15.8"
+            },
+            {
+              "element": "close",
+              "name": "당일종가",
+              "type": "Number",
+              "length": "15.8"
+            },
+            {
+              "element": "s_time",
+              "name": "장시작시간(HHMMSS)",
+              "type": "String",
+              "length": "6"
+            },
+            {
+              "element": "e_time",
+              "name": "장종료시간(HHMMSS)",
+              "type": "String",
+              "length": "6"
+            },
+            {
+              "element": "timediff",
+              "name": "시차",
+              "type": "String",
+              "length": "4"
+            }
+          ]
+        },
+        {
+          "element": "g3203OutBlock1",
+          "name": "g3203OutBlock1",
+          "type": "Object",
+          "fields": [
+            {
+              "element": "date",
+              "name": "날짜",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "loctime",
+              "name": "현지시간",
+              "type": "String",
+              "length": "6"
+            },
+            {
+              "element": "open",
+              "name": "시가",
+              "type": "Number",
+              "length": "15.8"
+            },
+            {
+              "element": "high",
+              "name": "고가",
+              "type": "Number",
+              "length": "15.8"
+            },
+            {
+              "element": "low",
+              "name": "저가",
+              "type": "Number",
+              "length": "15.8"
+            },
+            {
+              "element": "close",
+              "name": "종가",
+              "type": "Number",
+              "length": "15.8"
+            },
+            {
+              "element": "exevol",
+              "name": "체결량",
+              "type": "Number",
+              "length": "16"
+            },
+            {
+              "element": "amount",
+              "name": "거래대금",
+              "type": "Number",
+              "length": "16"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "g3204": {
+    "path": "/overseas-stock/chart",
+    "req": {
+      "body": [
+        {
+          "element": "g3204InBlock",
+          "name": "g3204InBlock",
+          "type": "Object",
+          "fields": [
+            {
+              "element": "sujung",
+              "name": "수정주가여부(Y:적용N:비적용)",
+              "type": "String",
+              "length": "1"
+            },
+            {
+              "element": "delaygb",
+              "name": "지연구분",
+              "type": "String",
+              "length": "1"
+            },
+            {
+              "element": "keysymbol",
+              "name": "KEY종목코드",
+              "type": "String",
+              "length": "18"
+            },
+            {
+              "element": "exchcd",
+              "name": "거래소코드",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "symbol",
+              "name": "종목코드",
+              "type": "String",
+              "length": "16"
+            },
+            {
+              "element": "gubun",
+              "name": "주기구분(5:년)",
+              "type": "String",
+              "length": "1"
+            },
+            {
+              "element": "qrycnt",
+              "name": "요청건수(최대-압축:2000비압축:5",
+              "type": "Number",
+              "length": "4"
+            },
+            {
+              "element": "comp_yn",
+              "name": "압축여부(Y:압축N:비압축)",
+              "type": "String",
+              "length": "1"
+            },
+            {
+              "element": "sdate",
+              "name": "시작일자",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "edate",
+              "name": "종료일자",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "cts_date",
+              "name": "연속일자",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "cts_info",
+              "name": "연속정보",
+              "type": "String",
+              "length": "6"
+            }
+          ]
+        }
+      ]
+    },
+    "resp": {
+      "body": [
+        {
+          "element": "g3204OutBlock",
+          "name": "g3204OutBlock",
+          "type": "Object",
+          "fields": [
+            {
+              "element": "delaygb",
+              "name": "지연구분",
+              "type": "String",
+              "length": "1"
+            },
+            {
+              "element": "keysymbol",
+              "name": "KEY종목코드",
+              "type": "String",
+              "length": "18"
+            },
+            {
+              "element": "exchcd",
+              "name": "거래소코드",
+              "type": "String",
+              "length": "2"
+            },
+            {
+              "element": "symbol",
+              "name": "종목코드",
+              "type": "String",
+              "length": "16"
+            },
+            {
+              "element": "cts_date",
+              "name": "연속일자",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "cts_info",
+              "name": "연속정보",
+              "type": "String",
+              "length": "6"
+            },
+            {
+              "element": "rec_count",
+              "name": "레코드카운트",
+              "type": "Number",
+              "length": "7"
+            },
+            {
+              "element": "preopen",
+              "name": "전일시가",
+              "type": "Number",
+              "length": "15.8"
+            },
+            {
+              "element": "prehigh",
+              "name": "전일고가",
+              "type": "Number",
+              "length": "15.8"
+            },
+            {
+              "element": "prelow",
+              "name": "전일저가",
+              "type": "Number",
+              "length": "15.8"
+            },
+            {
+              "element": "preclose",
+              "name": "전일종가",
+              "type": "Number",
+              "length": "15.8"
+            },
+            {
+              "element": "prevolume",
+              "name": "전일거래량",
+              "type": "Number",
+              "length": "16"
+            },
+            {
+              "element": "open",
+              "name": "당일시가",
+              "type": "Number",
+              "length": "15.8"
+            },
+            {
+              "element": "high",
+              "name": "당일고가",
+              "type": "Number",
+              "length": "15.8"
+            },
+            {
+              "element": "low",
+              "name": "당일저가",
+              "type": "Number",
+              "length": "15.8"
+            },
+            {
+              "element": "close",
+              "name": "당일종가",
+              "type": "Number",
+              "length": "15.8"
+            },
+            {
+              "element": "uplimit",
+              "name": "상한가",
+              "type": "Number",
+              "length": "15.8"
+            },
+            {
+              "element": "dnlimit",
+              "name": "하한가",
+              "type": "Number",
+              "length": "15.8"
+            },
+            {
+              "element": "s_time",
+              "name": "장시작시간(HHMMSS)",
+              "type": "String",
+              "length": "6"
+            },
+            {
+              "element": "e_time",
+              "name": "장종료시간(HHMMSS)",
+              "type": "String",
+              "length": "6"
+            },
+            {
+              "element": "dshmin",
+              "name": "동시호가처리시간(MM:분)",
+              "type": "String",
+              "length": "2"
+            }
+          ]
+        },
+        {
+          "element": "g3204OutBlock1",
+          "name": "g3204OutBlock1",
+          "type": "Object",
+          "fields": [
+            {
+              "element": "date",
+              "name": "날짜",
+              "type": "String",
+              "length": "8"
+            },
+            {
+              "element": "open",
+              "name": "시가",
+              "type": "Number",
+              "length": "15.8"
+            },
+            {
+              "element": "high",
+              "name": "고가",
+              "type": "Number",
+              "length": "15.8"
+            },
+            {
+              "element": "low",
+              "name": "저가",
+              "type": "Number",
+              "length": "15.8"
+            },
+            {
+              "element": "close",
+              "name": "종가",
+              "type": "Number",
+              "length": "15.8"
+            },
+            {
+              "element": "volume",
+              "name": "거래량",
+              "type": "Number",
+              "length": "16"
+            },
+            {
+              "element": "amount",
+              "name": "거래대금",
+              "type": "Number",
+              "length": "16"
+            },
+            {
+              "element": "jongchk",
+              "name": "수정구분",
+              "type": "Number",
+              "length": "13"
+            },
+            {
+              "element": "prtt_rate",
+              "name": "수정비율",
+              "type": "Number",
+              "length": "6.2"
+            },
+            {
+              "element": "pricechk",
+              "name": "수정주가반영항목",
+              "type": "Number",
+              "length": "13"
+            },
+            {
+              "element": "ratevalue",
+              "name": "수정비율반영거래대금",
+              "type": "Number",
+              "length": "12"
+            },
+            {
+              "element": "sign",
+              "name": "종가등락구분(1:상한2:상승3:보합",
+              "type": "String",
+              "length": "1"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
